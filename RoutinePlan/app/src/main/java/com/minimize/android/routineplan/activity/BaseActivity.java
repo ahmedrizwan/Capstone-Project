@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,7 +9,7 @@ import com.firebase.client.Firebase;
  * Created by ahmedrizwan on 09/04/2016.
  */
 public class BaseActivity extends AppCompatActivity{
-  private Firebase mFirebaseRef;
+  public Firebase mFirebaseRef;
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
