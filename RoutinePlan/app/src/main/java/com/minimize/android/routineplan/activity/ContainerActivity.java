@@ -3,7 +3,9 @@ package com.minimize.android.routineplan.activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.fragment.BaseFragment;
+import com.minimize.android.routineplan.fragment.HistoryFragment;
+import com.minimize.android.routineplan.fragment.RoutinesFragment;
+import com.minimize.android.routineplan.fragment.UserFragment;
 import com.ncapdevi.fragnav.FragNavController;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
@@ -21,9 +23,9 @@ public class ContainerActivity extends BaseActivity {
     setContentView(R.layout.activity_container);
     List<Fragment> fragments = new ArrayList<>(5);
 
-    fragments.add(new BaseFragment());
-    fragments.add(new BaseFragment());
-    fragments.add(new BaseFragment());
+    fragments.add(new RoutinesFragment());
+    fragments.add(new HistoryFragment());
+    fragments.add(new UserFragment());
 
     mNavController =
         new FragNavController(getSupportFragmentManager(), R.id.fragment_container, fragments);
