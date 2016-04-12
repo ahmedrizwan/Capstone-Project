@@ -37,6 +37,12 @@ public class RoutinesFragment extends BaseFragment {
       }
     });
 
+    mBinding.fab.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        mFirebaseRef.child("Routines").child("dummyUserId").child("name").setValue("Programming");
+      }
+    });
+
     return mBinding.getRoot();
   }
 }
