@@ -17,6 +17,7 @@ public class App extends Application{
   @Override public void onCreate() {
     super.onCreate();
     Firebase.setAndroidContext(this);
+    Firebase.getDefaultConfig().setPersistenceEnabled(true);
     mFirebaseRef = new Firebase("https://routineplan.firebaseio.com/");
     Timber.plant(new Timber.DebugTree());
   }
