@@ -48,7 +48,6 @@ public class RoutinesFragment extends BaseFragment {
             viewDataBinding.textView.setText(item);
             viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
-
                 Intent intent = new Intent(getContext(), TasksActivity.class);
                 intent.putExtra("Routine", item);
                 startActivity(intent);
