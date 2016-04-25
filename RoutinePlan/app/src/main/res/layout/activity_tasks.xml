@@ -14,17 +14,20 @@
         android:orientation="vertical"
         >
 
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:visibility="gone"
+          android:text="@string/display_no_tasks"
+          />
+
       <android.support.v7.widget.RecyclerView
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:id="@+id/recycler_view_routines"
           />
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:text="@string/display_no_tasks"
-          />
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
