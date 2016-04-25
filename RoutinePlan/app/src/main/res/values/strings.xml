@@ -1,3 +1,5 @@
 <resources>
   <string name="app_name">RoutinePlan</string>
+  <string name="display_no_tasks">Tap on + to add tasks...</string>
+  <string name="display_no_routines">Tap on + to add Routines...</string>
 </resources>

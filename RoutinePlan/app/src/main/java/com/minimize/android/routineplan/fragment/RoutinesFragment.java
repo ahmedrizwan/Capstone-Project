@@ -1,5 +1,6 @@
 package com.minimize.android.routineplan.fragment;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -14,6 +15,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.minimize.android.routineplan.R;
+import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.databinding.FragmentRoutinesBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
@@ -41,7 +43,13 @@ public class RoutinesFragment extends BaseFragment {
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
         new Action1<SimpleViewHolder<String, ItemRoutineBinding>>() {
           @Override public void call(SimpleViewHolder<String, ItemRoutineBinding> viewHolder) {
-            viewHolder.getViewDataBinding().textView.setText(viewHolder.getItem());
+            final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
+            viewDataBinding.textView.setText(viewHolder.getItem());
+            viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
+              @Override public void onClick(View v) {
+                startActivity(new Intent(getContext(), TasksActivity.class));
+              }
+            });
           }
         });
 
