@@ -12,19 +12,19 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.minimize.android.routineplan.R;
+import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
+import com.minimize.android.routineplan.flux.stores.TasksStore;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
-import java.util.ArrayList;
+import com.squareup.otto.Subscribe;
 import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
+import timber.log.Timber;
 
 /**
  * Created by ahmedrizwan on 25/04/2016.
@@ -32,22 +32,26 @@ import rx.functions.Action1;
 public class TasksActivity extends BaseActivity {
   ActivityTasksBinding mBinding;
 
+  TasksStore mTasksStore;
+  RxDataSource<Task> rxDataSource;
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
     mBinding.recyclerViewRoutines.setLayoutManager(new LinearLayoutManager(this));
 
+    mTasksStore = TasksStore.get(mDispatcher);
+
     final String routine = getIntent().getStringExtra("Routine");
     final Firebase tasksRef = new Firebase("https://routineplan.firebaseio.com/routines/" + android_id + "/" + routine);
 
-
-    final RxDataSource<String> rxDataSource = new RxDataSource<>(Collections.<String>emptyList());
+    rxDataSource = new RxDataSource<>(Collections.<Task>emptyList());
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
-        new Action1<SimpleViewHolder<String, ItemRoutineBinding>>() {
-          @Override public void call(final SimpleViewHolder<String, ItemRoutineBinding> viewHolder) {
+        new Action1<SimpleViewHolder<Task, ItemRoutineBinding>>() {
+          @Override public void call(final SimpleViewHolder<Task, ItemRoutineBinding> viewHolder) {
             final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
-            final String item = viewHolder.getItem();
-            viewDataBinding.textView.setText(item);
+            final Task item = viewHolder.getItem();
+            viewDataBinding.textView.setText(item.getName()+" - "+item.getTime());
             viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
 
@@ -55,24 +59,6 @@ public class TasksActivity extends BaseActivity {
             });
           }
         });
-
-    tasksRef.addValueEventListener(new ValueEventListener() {
-      @Override public void onDataChange(DataSnapshot dataSnapshot) {
-        try {
-          List<String> routines = new ArrayList<>();
-          for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            routines.add(snapshot.getKey());
-          }
-          rxDataSource.updateDataSet(routines).updateAdapter();
-        } catch (NullPointerException e) {
-
-        }
-      }
-
-      @Override public void onCancelled(FirebaseError firebaseError) {
-
-      }
-    });
 
     mBinding.fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
@@ -87,10 +73,9 @@ public class TasksActivity extends BaseActivity {
         params.gravity = Gravity.CENTER;
         numberPicker.setLayoutParams(params);
         String[] displayedValues = { "30 Mins", "1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours" };
-        numberPicker.setDisplayedValues(
-            displayedValues);
+        numberPicker.setDisplayedValues(displayedValues);
         numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(displayedValues.length-1);
+        numberPicker.setMaxValue(displayedValues.length - 1);
         LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(editTextTaskName);
@@ -113,5 +98,29 @@ public class TasksActivity extends BaseActivity {
             .show();
       }
     });
+
+    mActionsCreator.getTasks(android_id, routine);
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+    mDispatcher.register(this);
+    mDispatcher.register(mTasksStore);
+
+  }
+
+  @Override protected void onPause() {
+    super.onPause();
+    mDispatcher.unregister(this);
+    mDispatcher.unregister(mTasksStore);
+  }
+
+  @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
+    List<Task> tasks = tasksEvent.mTasks;
+    rxDataSource.updateDataSet(tasks).updateAdapter();
+  }
+
+  @Subscribe public void onTasksError(TasksStore.TasksError tasksError) {
+    Timber.e("onTasksError : " + tasksError.mErrorMessage);
   }
 }

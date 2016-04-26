@@ -10,17 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.databinding.FragmentRoutinesBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
+import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
-import java.util.ArrayList;
+import com.squareup.otto.Subscribe;
 import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
@@ -33,13 +30,18 @@ public class RoutinesFragment extends BaseFragment {
 
   FragmentRoutinesBinding mBinding;
 
+  RoutinesStore mRoutinesStore;
+  RxDataSource<String> rxDataSource;
+
   @Nullable @Override public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
       @Nullable final Bundle savedInstanceState) {
 
     mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_routines, container, false);
     mBinding.recyclerViewRoutines.setLayoutManager(new LinearLayoutManager(getContext()));
 
-    final RxDataSource<String> rxDataSource = new RxDataSource<>(Collections.<String>emptyList());
+    mRoutinesStore = RoutinesStore.get(mDispatcher);
+
+    rxDataSource = new RxDataSource<>(Collections.<String>emptyList());
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
         new Action1<SimpleViewHolder<String, ItemRoutineBinding>>() {
           @Override public void call(final SimpleViewHolder<String, ItemRoutineBinding> viewHolder) {
@@ -56,7 +58,6 @@ public class RoutinesFragment extends BaseFragment {
           }
         });
 
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/routines/" + android_id);
     mBinding.fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         //mFirebaseRef.child("Routines").child("dummyUserId").child("name").setValue("Programming");
@@ -66,32 +67,38 @@ public class RoutinesFragment extends BaseFragment {
               @Override public void onInput(MaterialDialog dialog, CharSequence input) {
                 // Do something
                 if (input.length() > 0) {
-                  routinesRef.child(input.toString().trim()).setValue(0);
+                  mActionsCreator.createRoutine(android_id, input.toString().trim());
                 }
               }
             })
             .show();
       }
     });
-    routinesRef.addValueEventListener(new ValueEventListener() {
-      @Override public void onDataChange(DataSnapshot dataSnapshot) {
-        try {
-          Timber.e("onDataChange : " + dataSnapshot.getValue().toString());
-          List<String> routines = new ArrayList<String>();
-          for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            routines.add(snapshot.getKey());
-          }
-          rxDataSource.updateDataSet(routines).updateAdapter();
-        } catch (NullPointerException e) {
 
-        }
-      }
-
-      @Override public void onCancelled(FirebaseError firebaseError) {
-
-      }
-    });
+    mActionsCreator.getRoutines(android_id);
 
     return mBinding.getRoot();
+  }
+
+  @Override public void onResume() {
+    super.onResume();
+    mDispatcher.register(this);
+    mDispatcher.register(mRoutinesStore);
+  }
+
+  @Override public void onPause() {
+    super.onPause();
+    mDispatcher.unregister(this);
+    mDispatcher.unregister(mRoutinesStore);
+  }
+
+  @Subscribe public void onRoutinesRetrieved(RoutinesStore.RoutinesEvent routinesEvent) {
+    List<String> routines = routinesEvent.routinesList;
+    Timber.e("onRoutinesRetrieved : "+routines.size());
+    rxDataSource.updateDataSet(routines).updateAdapter();
+  }
+
+  @Subscribe public void onRoutinesError(RoutinesStore.RoutinesError routinesError) {
+    Timber.e("onRoutinesError : " + routinesError.errorMessage);
   }
 }
