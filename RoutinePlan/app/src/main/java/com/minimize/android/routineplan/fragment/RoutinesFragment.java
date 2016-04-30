@@ -67,7 +67,7 @@ public class RoutinesFragment extends BaseFragment {
               @Override public void onInput(MaterialDialog dialog, CharSequence input) {
                 // Do something
                 if (input.length() > 0) {
-                  mActionsCreator.createRoutine(android_id, input.toString().trim());
+                  mActionsCreator.createRoutine(input.toString().trim());
                 }
               }
             })
@@ -75,7 +75,7 @@ public class RoutinesFragment extends BaseFragment {
       }
     });
 
-    mActionsCreator.getRoutines(android_id);
+    mActionsCreator.getRoutines();
 
     return mBinding.getRoot();
   }

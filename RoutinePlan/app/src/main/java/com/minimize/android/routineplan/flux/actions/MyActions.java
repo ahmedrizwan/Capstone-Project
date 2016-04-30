@@ -6,19 +6,22 @@ package com.minimize.android.routineplan.flux.actions;
 public interface MyActions {
 
   String GET_ROUTINES = "get-routines";
-
-  void getRoutines(String user);
-
-  String GET_TASKS = "get-tasks";
-
-  void getTasks(String user, String routine);
-
+  String RENAME_ROUTINE = "rename-routine";
+  String DELETE_ROUTINE = "delete-routine";
   String CREATE_ROUTINE = "create-routine";
 
-  void createRoutine(String user, String name);
+  void getRoutines();
 
+  void renameRoutine(String oldName, String newName);
 
+  void deleteRoutine(String routine);
 
+  void createRoutine(String name);
 
+  String GET_TASKS = "get-tasks";
+  String CREATE_TASK = "create-task";
 
+  void getTasks(String routine);
+
+  void createTask(String routine, String task, String time);
 }

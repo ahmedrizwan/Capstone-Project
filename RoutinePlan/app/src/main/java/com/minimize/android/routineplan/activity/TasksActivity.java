@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.firebase.client.Firebase;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
@@ -31,7 +30,6 @@ import timber.log.Timber;
  */
 public class TasksActivity extends BaseActivity {
   ActivityTasksBinding mBinding;
-
   TasksStore mTasksStore;
   RxDataSource<Task> rxDataSource;
 
@@ -43,7 +41,6 @@ public class TasksActivity extends BaseActivity {
     mTasksStore = TasksStore.get(mDispatcher);
 
     final String routine = getIntent().getStringExtra("Routine");
-    final Firebase tasksRef = new Firebase("https://routineplan.firebaseio.com/routines/" + android_id + "/" + routine);
 
     rxDataSource = new RxDataSource<>(Collections.<Task>emptyList());
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
@@ -51,7 +48,7 @@ public class TasksActivity extends BaseActivity {
           @Override public void call(final SimpleViewHolder<Task, ItemRoutineBinding> viewHolder) {
             final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
             final Task item = viewHolder.getItem();
-            viewDataBinding.textView.setText(item.getName()+" - "+item.getTime());
+            viewDataBinding.textView.setText(item.getName() + " - " + item.getTime());
             viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
 
@@ -90,23 +87,21 @@ public class TasksActivity extends BaseActivity {
                 String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
                 String taskName = editTextTaskName.getText().toString();
                 if (taskName.length() > 0) {
-                  tasksRef.child(taskName).setValue(time);
+                  mActionsCreator.createTask(routine, taskName, time);
                 }
               }
             })
-
             .show();
       }
     });
 
-    mActionsCreator.getTasks(android_id, routine);
+    mActionsCreator.getTasks(routine);
   }
 
   @Override protected void onResume() {
     super.onResume();
     mDispatcher.register(this);
     mDispatcher.register(mTasksStore);
-
   }
 
   @Override protected void onPause() {

@@ -8,6 +8,7 @@ import com.firebase.client.Firebase;
 import com.minimize.android.routineplan.App;
 import com.minimize.android.routineplan.flux.actions.ActionsCreator;
 import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
+import com.pixplicity.easyprefs.library.Prefs;
 
 /**
  * Created by ahmedrizwan on 09/04/2016.
@@ -15,7 +16,6 @@ import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
 public class BaseFragment extends Fragment {
 
   public Firebase mFirebaseRef;
-  String android_id;
   public Dispatcher mDispatcher;
   public ActionsCreator mActionsCreator;
 
@@ -23,7 +23,8 @@ public class BaseFragment extends Fragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mFirebaseRef = new Firebase("https://routineplan.firebaseio.com/");
-    android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+
     App application = (App) getActivity().getApplication();
     mDispatcher = application.getDispatcher();
     mActionsCreator = application.getActionsCreator();
