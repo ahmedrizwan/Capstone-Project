@@ -70,7 +70,6 @@ public class ActionsCreator implements MyActions {
           for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
             tasks.add(new Task(snapshot.getKey().toString(), snapshot.getValue().toString()));
           }
-
           dispatcher.dispatch(MyActions.GET_TASKS, Keys.TASKS, tasks);
           //rxDataSource.updateDataSet(routines).updateAdapter();
         } catch (NullPointerException e) {

@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,15 @@ import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
+import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
+import com.minimize.android.routineplan.itemhelper.SimpleItemTouchHelperCallback;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
 import com.squareup.otto.Subscribe;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import rx.functions.Action1;
 import timber.log.Timber;
 
@@ -32,6 +37,8 @@ public class TasksActivity extends BaseActivity {
   ActivityTasksBinding mBinding;
   TasksStore mTasksStore;
   RxDataSource<Task> rxDataSource;
+  RecyclerListAdapter mRecyclerListAdapter;
+  private ItemTouchHelper mItemTouchHelper;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -56,6 +63,21 @@ public class TasksActivity extends BaseActivity {
             });
           }
         });
+
+    mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new Callable() {
+      @Override public Object call() throws Exception {
+        return null;
+      }
+    }, new Callable() {
+      @Override public Object call() throws Exception {
+        return null;
+      }
+    });
+    mBinding.recyclerViewRoutines.setAdapter(mRecyclerListAdapter);
+    ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mRecyclerListAdapter);
+
+    mItemTouchHelper = new ItemTouchHelper(callback);
+    mItemTouchHelper.attachToRecyclerView(mBinding.recyclerViewRoutines);
 
     mBinding.fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
@@ -112,7 +134,11 @@ public class TasksActivity extends BaseActivity {
 
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
     List<Task> tasks = tasksEvent.mTasks;
-    rxDataSource.updateDataSet(tasks).updateAdapter();
+    List<String> tasksString = new ArrayList<>();
+    for (Task task : tasks) {
+      tasksString.add(task.getName() + " - " + task.getTime());
+    }
+    mRecyclerListAdapter.updateDataSet(tasksString);
   }
 
   @Subscribe public void onTasksError(TasksStore.TasksError tasksError) {
