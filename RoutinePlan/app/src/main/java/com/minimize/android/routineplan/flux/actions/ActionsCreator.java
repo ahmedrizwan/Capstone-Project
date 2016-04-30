@@ -97,9 +97,21 @@ public class ActionsCreator implements MyActions {
     routinesRef.child(name).setValue(0);
   }
 
-  @Override public void renameRoutine(String oldName, String newName) {
+  @Override public void renameRoutine(final String oldName, final String newName) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/routines/" + user);
+    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
+    final Firebase oldTaskRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + oldName);
+    oldTaskRef.addValueEventListener(new ValueEventListener() {
+      @Override public void onDataChange(DataSnapshot dataSnapshot) {
+        oldTaskRef.removeEventListener(this);
+        routinesRef.child(newName).setValue(dataSnapshot.getValue());
+        oldTaskRef.removeValue();
+      }
+
+      @Override public void onCancelled(FirebaseError firebaseError) {
+
+      }
+    });
   }
 
   @Override public void deleteRoutine(String routine) {

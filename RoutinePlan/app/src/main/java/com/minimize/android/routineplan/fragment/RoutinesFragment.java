@@ -18,6 +18,7 @@ import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
 import com.squareup.otto.Subscribe;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
@@ -48,11 +49,39 @@ public class RoutinesFragment extends BaseFragment {
             final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
             final String item = viewHolder.getItem();
             viewDataBinding.textView.setText(item);
-            viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
+            View root = viewDataBinding.getRoot();
+            root.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
                 Intent intent = new Intent(getContext(), TasksActivity.class);
                 intent.putExtra("Routine", item);
                 startActivity(intent);
+              }
+            });
+            root.setOnLongClickListener(new View.OnLongClickListener() {
+              @Override public boolean onLongClick(View v) {
+                new MaterialDialog.Builder(getContext())
+                    .title("Edit Routine")
+                    .items(Arrays.asList("Rename"))
+                    .itemsCallback(new MaterialDialog.ListCallback() {
+                      @Override
+                      public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        if (text.equals("Rename")) {
+                          new MaterialDialog.Builder(getContext()).title("Rename Routine")
+                              .inputType(InputType.TYPE_CLASS_TEXT)
+                              .input("Routine's Name", null, new MaterialDialog.InputCallback() {
+                                @Override public void onInput(MaterialDialog dialog, CharSequence input) {
+                                  // Do something
+                                  if (input.length() > 0) {
+                                    mActionsCreator.renameRoutine(item, input.toString().trim());
+                                  }
+                                }
+                              })
+                              .show();
+                        }
+                      }
+                    })
+                    .show();
+                return false;
               }
             });
           }
