@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.minimize.android.routineplan.R;
+import com.minimize.android.routineplan.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -18,13 +19,13 @@ import java.util.concurrent.Callable;
 public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapter.ItemViewHolder>
     implements ItemTouchHelperAdapter {
 
-  private final List<String> mItems = new ArrayList<>();
+  private final List<Task> mItems = new ArrayList<>();
   private final Callable mOnItemClick;
-  private final Callable mOnItemLongClick;
+  private final OnItemsReordered mOnItemsReordered;
 
-  public RecyclerListAdapter(List<String> items, Callable onItemClick, Callable onItemLongClick) {
+  public RecyclerListAdapter(List<Task> items, Callable onItemClick,OnItemsReordered onItemsReordered) {
     mOnItemClick = onItemClick;
-    mOnItemLongClick = onItemLongClick;
+    mOnItemsReordered = onItemsReordered;
     mItems.addAll(items);
   }
 
@@ -35,7 +36,8 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   }
 
   @Override public void onBindViewHolder(final ItemViewHolder holder, int position) {
-    holder.textView.setText(mItems.get(position));
+    final Task task = mItems.get(position);
+    holder.textView.setText(task.getName() + " - " + task.getTime());
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         try {
@@ -53,13 +55,15 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   }
 
   @Override public boolean onItemMove(int fromPosition, int toPosition) {
-    String prev = mItems.remove(fromPosition);
+    Task prev = mItems.remove(fromPosition);
     mItems.add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
     notifyItemMoved(fromPosition, toPosition);
+    mOnItemsReordered.onItemsReordered(mItems);
+
     return false;
   }
 
-  public void updateDataSet(List<String> items) {
+  public void updateDataSet(List<Task> items) {
     mItems.clear();
     mItems.addAll(items);
   }

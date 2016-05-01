@@ -9,7 +9,6 @@ import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
 import com.pixplicity.easyprefs.library.Prefs;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ActionsCreator implements MyActions {
@@ -17,16 +16,9 @@ public class ActionsCreator implements MyActions {
   private static ActionsCreator instance;
   final Dispatcher dispatcher;
 
-  final String currentDate;
-
-  private String getDateString() {
-    Calendar calendar = Calendar.getInstance();
-    return calendar.get(Calendar.YEAR) + "" + calendar.get(Calendar.MONTH) + "" + calendar.get(Calendar.DAY_OF_MONTH);
-  }
 
   public ActionsCreator(Dispatcher dispatcher) {
     this.dispatcher = dispatcher;
-    this.currentDate = getDateString();
   }
 
   public static ActionsCreator get(Dispatcher dispatcher) {
@@ -84,10 +76,19 @@ public class ActionsCreator implements MyActions {
     });
   }
 
-  @Override public void createTask(String routine, String task, String time) {
+  @Override public void createTask(String routine, Task task) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
-    routinesRef.child(routine).child(task).setValue(time);
+    routinesRef.child(routine).child(task.getName()).setValue(task.getTime());
+  }
+
+  @Override public void updateTasks(String routine, List<Task> tasks) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user+"/"+routine);
+    int priority = tasks.size();
+    for (Task task : tasks) {
+      routinesRef.child(task.getName()).setPriority(priority--);
+    }
   }
 
   @Override public void createRoutine(String name) {

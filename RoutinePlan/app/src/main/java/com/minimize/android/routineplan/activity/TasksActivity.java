@@ -18,12 +18,12 @@ import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
+import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
 import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
 import com.minimize.android.routineplan.itemhelper.SimpleItemTouchHelperCallback;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
 import com.squareup.otto.Subscribe;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -66,13 +66,15 @@ public class TasksActivity extends BaseActivity {
 
     mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new Callable() {
       @Override public Object call() throws Exception {
+
         return null;
       }
-    }, new Callable() {
-      @Override public Object call() throws Exception {
-        return null;
+    }, new OnItemsReordered() {
+      @Override public void onItemsReordered(List<Task> tasks) {
+        mActionsCreator.updateTasks(routine, tasks);
       }
     });
+
     mBinding.recyclerViewRoutines.setAdapter(mRecyclerListAdapter);
     ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mRecyclerListAdapter);
 
@@ -108,8 +110,9 @@ public class TasksActivity extends BaseActivity {
               @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
                 String taskName = editTextTaskName.getText().toString();
+                Task task = new Task(taskName, time);
                 if (taskName.length() > 0) {
-                  mActionsCreator.createTask(routine, taskName, time);
+                  mActionsCreator.createTask(routine, task);
                 }
               }
             })
@@ -134,11 +137,7 @@ public class TasksActivity extends BaseActivity {
 
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
     List<Task> tasks = tasksEvent.mTasks;
-    List<String> tasksString = new ArrayList<>();
-    for (Task task : tasks) {
-      tasksString.add(task.getName() + " - " + task.getTime());
-    }
-    mRecyclerListAdapter.updateDataSet(tasksString);
+    mRecyclerListAdapter.updateDataSet(tasks);
   }
 
   @Subscribe public void onTasksError(TasksStore.TasksError tasksError) {
