@@ -12,7 +12,6 @@ import timber.log.Timber;
 public class Utility {
   public static String checkForErrorResponse(Action action) {
     Object errorMessage = (Throwable) action.getData().get(Keys.ERROR);
-    Timber.e("checkForErrorResponse : BeforeCheck");
     //Timber.e("checkForErrorResponse : "+errorMessage.getClass().getName());
     if (errorMessage instanceof FirebaseError) {
       String string = ((FirebaseError) errorMessage).getMessage();

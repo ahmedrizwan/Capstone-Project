@@ -13,8 +13,10 @@ import android.widget.TextView;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.Task;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import timber.log.Timber;
 
 public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapter.ItemViewHolder>
     implements ItemTouchHelperAdapter {
@@ -55,11 +57,20 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   }
 
   @Override public boolean onItemMove(int fromPosition, int toPosition) {
-    Task prev = mItems.remove(fromPosition);
-    mItems.add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
-    notifyItemMoved(fromPosition, toPosition);
+    if (fromPosition < toPosition) {
+      for (int i = fromPosition; i < toPosition; i++) {
+        Collections.swap(mItems, i, i + 1);
+      }
+    } else {
+      for (int i = fromPosition; i > toPosition; i--) {
+        Collections.swap(mItems, i, i - 1);
+      }
+    }
+    for (Task item : mItems) {
+      Timber.e("onItemMove : " + item.getName());
+    }
     mOnItemsReordered.onItemsReordered(mItems);
-
+    notifyItemMoved(fromPosition, toPosition);
     return false;
   }
 

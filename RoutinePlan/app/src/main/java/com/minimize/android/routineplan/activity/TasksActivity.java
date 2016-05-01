@@ -26,6 +26,8 @@ import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
 import com.squareup.otto.Subscribe;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import rx.functions.Action1;
 import timber.log.Timber;
@@ -39,6 +41,9 @@ public class TasksActivity extends BaseActivity {
   RxDataSource<Task> rxDataSource;
   RecyclerListAdapter mRecyclerListAdapter;
   private ItemTouchHelper mItemTouchHelper;
+  private List<Task> mTasks;
+
+  private Timer mTimer;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -70,8 +75,21 @@ public class TasksActivity extends BaseActivity {
         return null;
       }
     }, new OnItemsReordered() {
-      @Override public void onItemsReordered(List<Task> tasks) {
-        mActionsCreator.updateTasks(routine, tasks);
+
+      @Override public void onItemsReordered(final List<Task> tasks) {
+        if (mTimer != null) {
+          mTimer.cancel();
+        }
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+          @Override public void run() {
+            runOnUiThread(new Runnable() {
+              @Override public void run() {
+                mActionsCreator.updateTasks(routine, tasks);
+              }
+            });
+          }
+        }, 1000);
       }
     });
 
@@ -112,7 +130,7 @@ public class TasksActivity extends BaseActivity {
                 String taskName = editTextTaskName.getText().toString();
                 Task task = new Task(taskName, time);
                 if (taskName.length() > 0) {
-                  mActionsCreator.createTask(routine, task);
+                  mActionsCreator.createTask(routine, task, mTasks.size());
                 }
               }
             })
@@ -136,8 +154,8 @@ public class TasksActivity extends BaseActivity {
   }
 
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
-    List<Task> tasks = tasksEvent.mTasks;
-    mRecyclerListAdapter.updateDataSet(tasks);
+    mTasks = tasksEvent.mTasks;
+    mRecyclerListAdapter.updateDataSet(mTasks);
   }
 
   @Subscribe public void onTasksError(TasksStore.TasksError tasksError) {

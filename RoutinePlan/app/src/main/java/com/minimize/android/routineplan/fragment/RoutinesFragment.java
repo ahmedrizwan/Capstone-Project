@@ -33,6 +33,7 @@ public class RoutinesFragment extends BaseFragment {
 
   RoutinesStore mRoutinesStore;
   RxDataSource<String> rxDataSource;
+  private List<String> mRoutines;
 
   @Nullable @Override public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
       @Nullable final Bundle savedInstanceState) {
@@ -96,7 +97,7 @@ public class RoutinesFragment extends BaseFragment {
               @Override public void onInput(MaterialDialog dialog, CharSequence input) {
                 // Do something
                 if (input.length() > 0) {
-                  mActionsCreator.createRoutine(input.toString().trim());
+                  mActionsCreator.createRoutine(input.toString().trim(), mRoutines.size());
                 }
               }
             })
@@ -122,9 +123,8 @@ public class RoutinesFragment extends BaseFragment {
   }
 
   @Subscribe public void onRoutinesRetrieved(RoutinesStore.RoutinesEvent routinesEvent) {
-    List<String> routines = routinesEvent.routinesList;
-    Timber.e("onRoutinesRetrieved : "+routines.size());
-    rxDataSource.updateDataSet(routines).updateAdapter();
+    mRoutines = routinesEvent.routinesList;
+    rxDataSource.updateDataSet(mRoutines).updateAdapter();
   }
 
   @Subscribe public void onRoutinesError(RoutinesStore.RoutinesError routinesError) {

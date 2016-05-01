@@ -16,7 +16,6 @@ public class ActionsCreator implements MyActions {
   private static ActionsCreator instance;
   final Dispatcher dispatcher;
 
-
   public ActionsCreator(Dispatcher dispatcher) {
     this.dispatcher = dispatcher;
   }
@@ -55,7 +54,7 @@ public class ActionsCreator implements MyActions {
   @Override public void getTasks(String routine) {
     String user = Prefs.getString(App.USER, null);
     final Firebase tasksRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine);
-    tasksRef.addValueEventListener(new ValueEventListener() {
+    tasksRef.orderByPriority().addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
         try {
           List<Task> tasks = new ArrayList<>();
@@ -76,7 +75,7 @@ public class ActionsCreator implements MyActions {
     });
   }
 
-  @Override public void createTask(String routine, Task task) {
+  @Override public void createTask(String routine, Task task, int priority) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
     routinesRef.child(routine).child(task.getName()).setValue(task.getTime());
@@ -84,14 +83,13 @@ public class ActionsCreator implements MyActions {
 
   @Override public void updateTasks(String routine, List<Task> tasks) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user+"/"+routine);
-    int priority = tasks.size();
-    for (Task task : tasks) {
-      routinesRef.child(task.getName()).setPriority(priority--);
+    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine);
+    for (int i = 0; i < tasks.size(); i++) {
+      routinesRef.child(tasks.get(i).getName()).setPriority(i + 1);
     }
   }
 
-  @Override public void createRoutine(String name) {
+  @Override public void createRoutine(String name, int priority) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
     routinesRef.child(name).setValue(0);

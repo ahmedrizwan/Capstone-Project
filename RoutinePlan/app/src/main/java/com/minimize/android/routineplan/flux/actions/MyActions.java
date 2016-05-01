@@ -19,7 +19,7 @@ public interface MyActions {
 
   void deleteRoutine(String routine);
 
-  void createRoutine(String name);
+  void createRoutine(String name, int priority);
 
   String GET_TASKS = "get-tasks";
   String CREATE_TASK = "create-task";
@@ -27,7 +27,8 @@ public interface MyActions {
 
   void getTasks(String routine);
 
-  void createTask(String routine, Task task);
+  void createTask(String routine, Task task, int priority);
+
 
   void updateTasks(String routine, List<Task> tasks);
 }
