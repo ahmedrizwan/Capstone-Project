@@ -8,4 +8,5 @@ public interface Keys {
   String ERROR = "error";
   String TASKS = "tasks";
   String BREAK = "break";
+  String ROUTINE = "routine";
 }

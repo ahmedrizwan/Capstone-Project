@@ -6,7 +6,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
+import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
 import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
 import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
@@ -37,12 +41,14 @@ import timber.log.Timber;
 public class TasksActivity extends BaseActivity {
   ActivityTasksBinding mBinding;
   TasksStore mTasksStore;
+  RoutinesStore mRoutinesStore;
   //RxDataSource<Task> rxDataSource;
   RecyclerListAdapter mRecyclerListAdapter;
   private ItemTouchHelper mItemTouchHelper;
   private List<Task> mTasks;
 
   private Timer mTimer;
+  private String mRoutine;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -50,13 +56,14 @@ public class TasksActivity extends BaseActivity {
     mBinding.recyclerViewRoutines.setLayoutManager(new LinearLayoutManager(this));
 
     mTasksStore = TasksStore.get(mDispatcher);
+    mRoutinesStore = RoutinesStore.get(mDispatcher);
 
     ActionBar supportActionBar = getSupportActionBar();
-    final String routine = getIntent().getStringExtra("Routine");
+    mRoutine = getIntent().getStringExtra("Routine");
 
     if (supportActionBar != null) {
       supportActionBar.setDisplayHomeAsUpEnabled(true);
-      supportActionBar.setTitle(routine + " Tasks");
+      supportActionBar.setTitle(mRoutine + " Tasks");
     }
 
     mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new Callable() {
@@ -75,7 +82,7 @@ public class TasksActivity extends BaseActivity {
           @Override public void run() {
             runOnUiThread(new Runnable() {
               @Override public void run() {
-                mActionsCreator.updateTasks(routine, tasks);
+                mActionsCreator.updateTasks(mRoutine, tasks);
               }
             });
           }
@@ -120,7 +127,7 @@ public class TasksActivity extends BaseActivity {
                 String taskName = editTextTaskName.getText().toString();
                 Task task = new Task(taskName, time);
                 if (taskName.length() > 0) {
-                  mActionsCreator.createTask(routine, task, mTasks.size());
+                  mActionsCreator.createTask(mRoutine, task, mTasks.size());
                 }
               }
             })
@@ -131,26 +138,29 @@ public class TasksActivity extends BaseActivity {
     mBinding.radioGroupBreak.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
       @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
         if (checkedId == R.id.radio_five_minutes) {
-          mActionsCreator.updateBreakInterval(routine, 5);
+          mActionsCreator.updateBreakInterval(mRoutine, 5);
         } else if (checkedId == R.id.radio_ten_minutes) {
-          mActionsCreator.updateBreakInterval(routine, 10);
+          mActionsCreator.updateBreakInterval(mRoutine, 10);
         }
       }
     });
-    mActionsCreator.getTasks(routine);
-    mActionsCreator.getBreakInterval(routine);
+    mActionsCreator.getTasks(mRoutine);
+    mActionsCreator.getBreakInterval(mRoutine);
   }
 
   @Override protected void onResume() {
     super.onResume();
     mDispatcher.register(this);
     mDispatcher.register(mTasksStore);
+    mDispatcher.register(mRoutinesStore);
+
   }
 
   @Override protected void onPause() {
     super.onPause();
     mDispatcher.unregister(this);
     mDispatcher.unregister(mTasksStore);
+    mDispatcher.unregister(mRoutinesStore);
   }
 
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
@@ -180,7 +190,36 @@ public class TasksActivity extends BaseActivity {
       case android.R.id.home:
         finish();
         break;
+      case R.id.rename:
+        Timber.e("onOptionsItemSelected : Rename");
+        //show material dialog
+        new MaterialDialog.Builder(this)
+            .title("Rename Routine")
+            .inputType(InputType.TYPE_CLASS_TEXT)
+            .input("Routine Name", mRoutine, false, new MaterialDialog.InputCallback() {
+              @Override public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                mActionsCreator.renameRoutine(mRoutine, input.toString().trim());
+              }
+            }).show();
+
+        break;
     }
     return super.onOptionsItemSelected(item);
+  }
+   @Subscribe public void onRoutineRename(RoutinesStore.RoutineRenameEvent routineRenameEvent) {
+     mRoutine = routineRenameEvent.mNewName;
+     ActionBar supportActionBar = getSupportActionBar();
+     if (supportActionBar != null) {
+       supportActionBar.setTitle(routineRenameEvent.mNewName + " Tasks");
+     }
+     mActionsCreator.getTasks(routineRenameEvent.mNewName);
+     mActionsCreator.getBreakInterval(routineRenameEvent.mNewName);
+   }
+
+  @Override public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater menuInflater = getMenuInflater();
+    menuInflater.inflate(R.menu.task_activity_menu, menu);
+
+    return super.onCreateOptionsMenu(menu);
   }
 }

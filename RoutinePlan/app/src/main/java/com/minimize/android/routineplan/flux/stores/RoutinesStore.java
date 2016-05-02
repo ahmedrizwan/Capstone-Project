@@ -29,15 +29,25 @@ public class RoutinesStore extends Store{
 
   @Subscribe @Override public void onAction(Action action) {
     Timber.e("onAction : Hereeeee!");
+    String errorMessage = "";
     switch (action.getType()) {
       case MyActions.GET_ROUTINES:
         //noinspection unchecked
-        String errorMessage = Utility.checkForErrorResponse(action);
+        errorMessage = Utility.checkForErrorResponse(action);
         if (errorMessage.equals("")) {
           List<String> routines = (List<String>) action.getData().get(Keys.ROUTINES);
           emitStoreChange(new RoutinesEvent(routines));
         } else {
           emitStoreChange(new RoutinesError(errorMessage));
+        }
+        break;
+      case MyActions.RENAME_ROUTINE:
+        errorMessage = Utility.checkForErrorResponse(action);
+        if (errorMessage.equals("")) {
+          String newName = (String) action.getData().get(Keys.ROUTINE);
+          emitStoreChange(new RoutineRenameEvent(newName));
+        } else {
+
         }
         break;
     }
@@ -59,4 +69,11 @@ public class RoutinesStore extends Store{
     }
   }
 
+  public class RoutineRenameEvent implements StoreChangeEvent {
+    public String mNewName;
+
+    public RoutineRenameEvent(String newName) {
+      mNewName = newName;
+    }
+  }
 }

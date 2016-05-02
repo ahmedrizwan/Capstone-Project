@@ -125,6 +125,7 @@ public class ActionsCreator implements MyActions {
         oldTaskRef.removeEventListener(this);
         routinesRef.child(newName).setValue(dataSnapshot.getValue());
         oldTaskRef.removeValue();
+        dispatcher.dispatch(MyActions.RENAME_ROUTINE, Keys.ROUTINE, newName);
       }
 
       @Override public void onCancelled(FirebaseError firebaseError) {
