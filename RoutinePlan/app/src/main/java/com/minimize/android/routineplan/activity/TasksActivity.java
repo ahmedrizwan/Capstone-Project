@@ -3,9 +3,11 @@ package com.minimize.android.routineplan.activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -49,24 +51,13 @@ public class TasksActivity extends BaseActivity {
 
     mTasksStore = TasksStore.get(mDispatcher);
 
+    ActionBar supportActionBar = getSupportActionBar();
     final String routine = getIntent().getStringExtra("Routine");
 
-    getSupportActionBar().setTitle(routine + " Tasks");
-
-    //rxDataSource = new RxDataSource<>(Collections.<Task>emptyList());
-    //rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_task).subscribe(
-    //    new Action1<SimpleViewHolder<Task, ItemRoutineBinding>>() {
-    //      @Override public void call(final SimpleViewHolder<Task, ItemRoutineBinding> viewHolder) {
-    //        final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
-    //        final Task item = viewHolder.getItem();
-    //        viewDataBinding.textViewRoutineName.setText(item.getName() + " - " + item.getTime());
-    //        viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
-    //          @Override public void onClick(View v) {
-    //
-    //          }
-    //        });
-    //      }
-    //    });
+    if (supportActionBar != null) {
+      supportActionBar.setDisplayHomeAsUpEnabled(true);
+      supportActionBar.setTitle(routine + " Tasks");
+    }
 
     mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new Callable() {
       @Override public Object call() throws Exception {
@@ -182,5 +173,14 @@ public class TasksActivity extends BaseActivity {
 
   @Subscribe public void onBreakError(TasksStore.BreakIntervalError breakIntervalError) {
     Timber.e("onBreakError : " + breakIntervalError.mError);
+  }
+
+  @Override public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        finish();
+        break;
+    }
+    return super.onOptionsItemSelected(item);
   }
 }
