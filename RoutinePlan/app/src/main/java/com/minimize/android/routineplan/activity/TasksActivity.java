@@ -24,15 +24,16 @@ import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
+import com.minimize.android.routineplan.itemhelper.OnItemClick;
 import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
 import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
 import com.minimize.android.routineplan.itemhelper.SimpleItemTouchHelperCallback;
 import com.squareup.otto.Subscribe;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import timber.log.Timber;
 
 /**
@@ -66,10 +67,47 @@ public class TasksActivity extends BaseActivity {
       supportActionBar.setTitle(mRoutine + " Tasks");
     }
 
-    mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new Callable() {
-      @Override public Object call() throws Exception {
+    mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new OnItemClick<Task>() {
+      @Override public void onItemClick(final Task oldTask, final int position) {
+        //Launch material dialog
+        final EditText editTextTaskName = new EditText(TasksActivity.this);
+        editTextTaskName.setLayoutParams(
+            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editTextTaskName.setHint("Task Name");
+        editTextTaskName.setText(oldTask.getName());
 
-        return null;
+        final NumberPicker numberPicker = new NumberPicker(TasksActivity.this);
+        LinearLayout.LayoutParams params =
+            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        numberPicker.setLayoutParams(params);
+        String[] displayedValues = { "30 Mins", "1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours" };
+        numberPicker.setDisplayedValues(displayedValues);
+        numberPicker.setMinValue(0);
+        numberPicker.setMaxValue(displayedValues.length - 1);
+        numberPicker.setValue(Arrays.asList(displayedValues).indexOf(oldTask.getTime()));
+
+        LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(editTextTaskName);
+        linearLayout.addView(numberPicker);
+
+        new MaterialDialog.Builder(TasksActivity.this).title("Edit Task")
+            .customView(linearLayout, true)
+            .positiveText("Update")
+            .negativeText("Cancel")
+            .onPositive(new MaterialDialog.SingleButtonCallback() {
+              @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
+                String taskName = editTextTaskName.getText().toString();
+                Task task = new Task(taskName, time);
+                if (taskName.length() > 0) {
+                  //mActionsCreator.upd(mRoutine, task, mTasks.size());
+                  mActionsCreator.updateTask(mRoutine, oldTask, task, position);
+                }
+              }
+            })
+            .show();
       }
     }, new OnItemsReordered() {
 
@@ -153,7 +191,6 @@ public class TasksActivity extends BaseActivity {
     mDispatcher.register(this);
     mDispatcher.register(mTasksStore);
     mDispatcher.register(mRoutinesStore);
-
   }
 
   @Override protected void onPause() {
@@ -185,6 +222,19 @@ public class TasksActivity extends BaseActivity {
     Timber.e("onBreakError : " + breakIntervalError.mError);
   }
 
+  @Subscribe public void onTaskUpdate(TasksStore.TaskUpdateEvent taskUpdateEvent) {
+    mActionsCreator.getTasks(mRoutine);
+  }
+  @Subscribe public void onRoutineRename(RoutinesStore.RoutineRenameEvent routineRenameEvent) {
+    mRoutine = routineRenameEvent.mNewName;
+    ActionBar supportActionBar = getSupportActionBar();
+    if (supportActionBar != null) {
+      supportActionBar.setTitle(routineRenameEvent.mNewName + " Tasks");
+    }
+    mActionsCreator.getTasks(routineRenameEvent.mNewName);
+    mActionsCreator.getBreakInterval(routineRenameEvent.mNewName);
+  }
+
   @Override public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case android.R.id.home:
@@ -193,28 +243,19 @@ public class TasksActivity extends BaseActivity {
       case R.id.rename:
         Timber.e("onOptionsItemSelected : Rename");
         //show material dialog
-        new MaterialDialog.Builder(this)
-            .title("Rename Routine")
+        new MaterialDialog.Builder(this).title("Rename Routine")
             .inputType(InputType.TYPE_CLASS_TEXT)
             .input("Routine Name", mRoutine, false, new MaterialDialog.InputCallback() {
               @Override public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                 mActionsCreator.renameRoutine(mRoutine, input.toString().trim());
               }
-            }).show();
+            })
+            .show();
 
         break;
     }
     return super.onOptionsItemSelected(item);
   }
-   @Subscribe public void onRoutineRename(RoutinesStore.RoutineRenameEvent routineRenameEvent) {
-     mRoutine = routineRenameEvent.mNewName;
-     ActionBar supportActionBar = getSupportActionBar();
-     if (supportActionBar != null) {
-       supportActionBar.setTitle(routineRenameEvent.mNewName + " Tasks");
-     }
-     mActionsCreator.getTasks(routineRenameEvent.mNewName);
-     mActionsCreator.getBreakInterval(routineRenameEvent.mNewName);
-   }
 
   @Override public boolean onCreateOptionsMenu(Menu menu) {
     MenuInflater menuInflater = getMenuInflater();

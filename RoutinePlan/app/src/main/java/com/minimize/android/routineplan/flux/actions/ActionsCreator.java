@@ -10,6 +10,7 @@ import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
 import com.pixplicity.easyprefs.library.Prefs;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 public class ActionsCreator implements MyActions {
 
@@ -83,16 +84,33 @@ public class ActionsCreator implements MyActions {
 
   @Override public void updateTasks(String routine, List<Task> tasks) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine);
+    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
     for (int i = 0; i < tasks.size(); i++) {
       routinesRef.child(tasks.get(i).getName()).setPriority(i + 1);
     }
+    Timber.e("updateTasks : Here");
   }
 
   @Override public void createRoutine(String name, int priority) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
     routinesRef.child(name).child("Break").setValue(5);
+  }
+
+  @Override public void updateTask(String routine, Task oldTask, Task newTask, int position) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
+    if (oldTask.getName().equals(newTask.getName())) {
+      if (oldTask.getTime().equals(newTask.getTime())) {
+        return;
+      } else {
+        routinesRef.child(oldTask.getName()).setValue(newTask.getTime(), position+1);
+      }
+    } else {
+      routinesRef.child(oldTask.getName()).removeValue();
+      routinesRef.child(newTask.getName()).setValue(newTask.getTime(), position+1);
+    }
+    dispatcher.dispatch(MyActions.UPDATE_TASK, Keys.TASK, newTask);
   }
 
   @Override public void updateBreakInterval(String routine, int interval) {
@@ -106,7 +124,7 @@ public class ActionsCreator implements MyActions {
     final Firebase breakRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Break");
     breakRef.addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
-        String breakInterval = (String) String.valueOf( dataSnapshot.getValue());
+        String breakInterval = (String) String.valueOf(dataSnapshot.getValue());
         dispatcher.dispatch(MyActions.GET_BREAK_INTERVAL, Keys.BREAK, breakInterval);
       }
 

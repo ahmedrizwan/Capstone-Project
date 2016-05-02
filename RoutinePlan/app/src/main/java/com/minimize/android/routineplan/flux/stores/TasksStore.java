@@ -28,9 +28,10 @@ public class TasksStore extends Store{
   }
 
   @Subscribe @Override public void onAction(Action action) {
+    String errorMessage = "";
     switch (action.getType()) {
       case MyActions.GET_TASKS:
-        String errorMessage = Utility.checkForErrorResponse(action);
+        errorMessage = Utility.checkForErrorResponse(action);
         if (errorMessage.equals("")) {
           List<Task> tasks = (List<Task>) action.getData().get(Keys.TASKS);
           emitStoreChange(new TasksEvent(tasks));
@@ -39,13 +40,18 @@ public class TasksStore extends Store{
         }
         break;
       case MyActions.GET_BREAK_INTERVAL:
-        String error = Utility.checkForErrorResponse(action);
-        if (error.equals("")) {
+       errorMessage = Utility.checkForErrorResponse(action);
+        if (errorMessage.equals("")) {
           String breakInterval = (String) action.getData().get(Keys.BREAK);
           emitStoreChange(new BreakIntervalEvent(breakInterval));
         } else {
-          emitStoreChange(new BreakIntervalError(error));
+          emitStoreChange(new BreakIntervalError(errorMessage));
         }
+        break;
+      case MyActions.UPDATE_TASK:
+        Task newTask = (Task) action.getData().get(Keys.TASK);
+        emitStoreChange(new TaskUpdateEvent(newTask));
+        break;
     }
   }
 
@@ -80,6 +86,14 @@ public class TasksStore extends Store{
 
     public BreakIntervalError(String error) {
       mError = error;
+    }
+  }
+
+  public class TaskUpdateEvent implements StoreChangeEvent {
+    public Task mNewTask;
+
+    public TaskUpdateEvent(Task newTask) {
+      mNewTask = newTask;
     }
   }
 }

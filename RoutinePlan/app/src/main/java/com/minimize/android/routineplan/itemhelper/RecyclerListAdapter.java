@@ -15,18 +15,17 @@ import com.minimize.android.routineplan.Task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import timber.log.Timber;
 
 public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapter.ItemViewHolder>
     implements ItemTouchHelperAdapter {
 
   private final List<Task> mItems = new ArrayList<>();
-  private final Callable mOnItemClick;
+  private final OnItemClick<Task> mOnItemClick;
   private final OnItemsReordered mOnItemsReordered;
 
-  public RecyclerListAdapter(List<Task> items, Callable onItemClick,OnItemsReordered onItemsReordered) {
-    mOnItemClick = onItemClick;
+  public RecyclerListAdapter(List<Task> items, OnItemClick<Task> itemClick, OnItemsReordered onItemsReordered) {
+    mOnItemClick = itemClick;
     mOnItemsReordered = onItemsReordered;
     mItems.addAll(items);
   }
@@ -37,18 +36,14 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     return itemViewHolder;
   }
 
-  @Override public void onBindViewHolder(final ItemViewHolder holder, int position) {
+  @Override public void onBindViewHolder(final ItemViewHolder holder, final int position) {
     final Task task = mItems.get(position);
     holder.textViewTaskName.setText(task.getName());
     holder.textViewTaskTime.setText(task.getTime());
 
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        try {
-          mOnItemClick.call();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        mOnItemClick.onItemClick(task, position);
       }
     });
   }

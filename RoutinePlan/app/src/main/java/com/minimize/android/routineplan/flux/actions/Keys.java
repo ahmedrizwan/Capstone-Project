@@ -9,4 +9,5 @@ public interface Keys {
   String TASKS = "tasks";
   String BREAK = "break";
   String ROUTINE = "routine";
+  String TASK = "task";
 }
