@@ -7,4 +7,5 @@ public interface Keys {
   String ROUTINES = "routines";
   String ERROR = "error";
   String TASKS = "tasks";
+  String BREAK = "break";
 }

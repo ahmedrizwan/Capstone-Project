@@ -32,14 +32,16 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   }
 
   @Override public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_routine, parent, false);
+    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task, parent, false);
     ItemViewHolder itemViewHolder = new ItemViewHolder(view);
     return itemViewHolder;
   }
 
   @Override public void onBindViewHolder(final ItemViewHolder holder, int position) {
     final Task task = mItems.get(position);
-    holder.textView.setText(task.getName() + " - " + task.getTime());
+    holder.textViewTaskName.setText(task.getName());
+    holder.textViewTaskTime.setText(task.getTime());
+
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         try {
@@ -77,6 +79,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   public void updateDataSet(List<Task> items) {
     mItems.clear();
     mItems.addAll(items);
+    notifyDataSetChanged();
   }
 
   @Override public int getItemCount() {
@@ -85,11 +88,13 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
   public static class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
-    public final TextView textView;
+    public final TextView textViewTaskName;
+    public final TextView textViewTaskTime;
 
     public ItemViewHolder(View itemView) {
       super(itemView);
-      textView = (TextView) itemView.findViewById(R.id.textView);
+      textViewTaskName = (TextView) itemView.findViewById(R.id.text_view_task_name);
+      textViewTaskTime = (TextView) itemView.findViewById(R.id.text_view_task_time);
     }
 
     @Override public void onItemSelected() {

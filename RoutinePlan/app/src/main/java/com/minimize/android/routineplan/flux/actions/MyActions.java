@@ -25,6 +25,14 @@ public interface MyActions {
   String CREATE_TASK = "create-task";
   String UPDATE_TASKS = "update-tasks";
 
+  String GET_BREAK_INTERVAL = "get-break-interval";
+
+  String UPDATE_BREAK_INTERVAL = "update-break-interval";
+
+  void updateBreakInterval(String routine, int interval);
+
+  void getBreakInterval(String routine);
+
   void getTasks(String routine);
 
   void createTask(String routine, Task task, int priority);

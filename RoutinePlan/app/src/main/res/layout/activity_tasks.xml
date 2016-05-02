@@ -12,7 +12,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+
         >
+      <RadioGroup
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="16dp"
+          android:id="@+id/radio_group_break"
+          >
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 Mins"
+            android:id="@+id/radio_five_minutes"
+            />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10 Mins"
+            android:id="@+id/radio_ten_minutes"
+            />
+      </RadioGroup>
 
       <TextView
           android:layout_width="match_parent"
@@ -24,9 +44,12 @@
 
       <android.support.v7.widget.RecyclerView
           android:layout_width="match_parent"
-          android:layout_height="match_parent"
+          android:layout_height="0dp"
+          android:layout_weight="1"
           android:id="@+id/recycler_view_routines"
           />
+
+
 
     </LinearLayout>
 

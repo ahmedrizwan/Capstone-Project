@@ -38,6 +38,14 @@ public class TasksStore extends Store{
           emitStoreChange(new TasksError(errorMessage));
         }
         break;
+      case MyActions.GET_BREAK_INTERVAL:
+        String error = Utility.checkForErrorResponse(action);
+        if (error.equals("")) {
+          String breakInterval = (String) action.getData().get(Keys.BREAK);
+          emitStoreChange(new BreakIntervalEvent(breakInterval));
+        } else {
+          emitStoreChange(new BreakIntervalError(error));
+        }
     }
   }
 
@@ -56,6 +64,22 @@ public class TasksStore extends Store{
     public TasksError(String errorMessage) {
 
       mErrorMessage = errorMessage;
+    }
+  }
+
+  public class BreakIntervalEvent implements StoreChangeEvent {
+    public String breakInterval;
+
+    public BreakIntervalEvent(String breakInterval) {
+      this.breakInterval = breakInterval;
+    }
+  }
+
+  public class BreakIntervalError implements StoreChangeEvent {
+    public String mError;
+
+    public BreakIntervalError(String error) {
+      mError = error;
     }
   }
 }

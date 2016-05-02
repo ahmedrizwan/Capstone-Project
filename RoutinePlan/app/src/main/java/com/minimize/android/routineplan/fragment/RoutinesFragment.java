@@ -49,7 +49,7 @@ public class RoutinesFragment extends BaseFragment {
           @Override public void call(final SimpleViewHolder<String, ItemRoutineBinding> viewHolder) {
             final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
             final String item = viewHolder.getItem();
-            viewDataBinding.textView.setText(item);
+            viewDataBinding.textViewRoutineName.setText(item);
             View root = viewDataBinding.getRoot();
             root.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {

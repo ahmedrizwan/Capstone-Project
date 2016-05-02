@@ -11,7 +11,7 @@
       >
 
     <TextView
-        android:id="@+id/text_view_routine_name"
+        android:id="@+id/text_view_task_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Test"
@@ -24,9 +24,15 @@
         android:id="@+id/text_view_task_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text_view_routine_name"
+        android:layout_toRightOf="@id/text_view_task_name"
         android:fontFamily="sans-serif-light"
-        android:text="@string/tap_to_add_tasks"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:gravity="end|center"
+        android:layout_alignTop="@id/text_view_task_name"
+        android:layout_alignBottom="@id/text_view_task_name"
+        tools:text="1 Hour"
+        android:textSize="16sp"
         />
   </RelativeLayout>
 </layout>

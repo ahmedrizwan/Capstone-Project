@@ -11,25 +11,22 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
+import android.widget.RadioGroup;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
-import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
 import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
 import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
 import com.minimize.android.routineplan.itemhelper.SimpleItemTouchHelperCallback;
-import com.minimize.android.rxrecycleradapter.RxDataSource;
-import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
 import com.squareup.otto.Subscribe;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
-import rx.functions.Action1;
 import timber.log.Timber;
 
 /**
@@ -38,7 +35,7 @@ import timber.log.Timber;
 public class TasksActivity extends BaseActivity {
   ActivityTasksBinding mBinding;
   TasksStore mTasksStore;
-  RxDataSource<Task> rxDataSource;
+  //RxDataSource<Task> rxDataSource;
   RecyclerListAdapter mRecyclerListAdapter;
   private ItemTouchHelper mItemTouchHelper;
   private List<Task> mTasks;
@@ -54,20 +51,22 @@ public class TasksActivity extends BaseActivity {
 
     final String routine = getIntent().getStringExtra("Routine");
 
-    rxDataSource = new RxDataSource<>(Collections.<Task>emptyList());
-    rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
-        new Action1<SimpleViewHolder<Task, ItemRoutineBinding>>() {
-          @Override public void call(final SimpleViewHolder<Task, ItemRoutineBinding> viewHolder) {
-            final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
-            final Task item = viewHolder.getItem();
-            viewDataBinding.textView.setText(item.getName() + " - " + item.getTime());
-            viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
-              @Override public void onClick(View v) {
+    getSupportActionBar().setTitle(routine + " Tasks");
 
-              }
-            });
-          }
-        });
+    //rxDataSource = new RxDataSource<>(Collections.<Task>emptyList());
+    //rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_task).subscribe(
+    //    new Action1<SimpleViewHolder<Task, ItemRoutineBinding>>() {
+    //      @Override public void call(final SimpleViewHolder<Task, ItemRoutineBinding> viewHolder) {
+    //        final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
+    //        final Task item = viewHolder.getItem();
+    //        viewDataBinding.textViewRoutineName.setText(item.getName() + " - " + item.getTime());
+    //        viewDataBinding.getRoot().setOnClickListener(new View.OnClickListener() {
+    //          @Override public void onClick(View v) {
+    //
+    //          }
+    //        });
+    //      }
+    //    });
 
     mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new Callable() {
       @Override public Object call() throws Exception {
@@ -138,7 +137,17 @@ public class TasksActivity extends BaseActivity {
       }
     });
 
+    mBinding.radioGroupBreak.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+      @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
+        if (checkedId == R.id.radio_five_minutes) {
+          mActionsCreator.updateBreakInterval(routine, 5);
+        } else if (checkedId == R.id.radio_ten_minutes) {
+          mActionsCreator.updateBreakInterval(routine, 10);
+        }
+      }
+    });
     mActionsCreator.getTasks(routine);
+    mActionsCreator.getBreakInterval(routine);
   }
 
   @Override protected void onResume() {
@@ -160,5 +169,18 @@ public class TasksActivity extends BaseActivity {
 
   @Subscribe public void onTasksError(TasksStore.TasksError tasksError) {
     Timber.e("onTasksError : " + tasksError.mErrorMessage);
+  }
+
+  @Subscribe public void onBreakInterval(TasksStore.BreakIntervalEvent breakIntervalEvent) {
+    Timber.e("onBreakInterval : " + breakIntervalEvent.breakInterval);
+    if (breakIntervalEvent.breakInterval.equals("5")) {
+      mBinding.radioFiveMinutes.setChecked(true);
+    } else if (breakIntervalEvent.breakInterval.equals("10")) {
+      mBinding.radioTenMinutes.setChecked(true);
+    }
+  }
+
+  @Subscribe public void onBreakError(TasksStore.BreakIntervalError breakIntervalError) {
+    Timber.e("onBreakError : " + breakIntervalError.mError);
   }
 }

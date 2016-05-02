@@ -53,7 +53,7 @@ public class ActionsCreator implements MyActions {
 
   @Override public void getTasks(String routine) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase tasksRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine);
+    final Firebase tasksRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
     tasksRef.orderByPriority().addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
         try {
@@ -78,7 +78,7 @@ public class ActionsCreator implements MyActions {
   @Override public void createTask(String routine, Task task, int priority) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
-    routinesRef.child(routine).child(task.getName()).setValue(task.getTime());
+    routinesRef.child(routine).child("Tasks").child(task.getName()).setValue(task.getTime());
   }
 
   @Override public void updateTasks(String routine, List<Task> tasks) {
@@ -92,7 +92,28 @@ public class ActionsCreator implements MyActions {
   @Override public void createRoutine(String name, int priority) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
-    routinesRef.child(name).setValue(0);
+    routinesRef.child(name).child("Break").setValue(5);
+  }
+
+  @Override public void updateBreakInterval(String routine, int interval) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase breakRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Break");
+    breakRef.setValue(interval);
+  }
+
+  @Override public void getBreakInterval(String routine) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase breakRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Break");
+    breakRef.addValueEventListener(new ValueEventListener() {
+      @Override public void onDataChange(DataSnapshot dataSnapshot) {
+        String breakInterval = (String) String.valueOf( dataSnapshot.getValue());
+        dispatcher.dispatch(MyActions.GET_BREAK_INTERVAL, Keys.BREAK, breakInterval);
+      }
+
+      @Override public void onCancelled(FirebaseError firebaseError) {
+
+      }
+    });
   }
 
   @Override public void renameRoutine(final String oldName, final String newName) {
