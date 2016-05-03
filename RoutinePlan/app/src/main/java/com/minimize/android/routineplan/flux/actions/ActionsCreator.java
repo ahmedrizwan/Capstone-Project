@@ -35,22 +35,21 @@ public class ActionsCreator implements MyActions {
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
     routinesRef.addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
-          List<Routine> routines = new ArrayList<Routine>();
-          for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            int totalMinutes = 0;
+        List<Routine> routines = new ArrayList<Routine>();
+        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+          int totalMinutes = 0;
+          try {
             HashMap values = (HashMap) snapshot.getValue();
             HashMap tasks = (HashMap) values.get("Tasks");
             for (Object minutes : tasks.values()) {
               totalMinutes += ((Long) minutes).intValue();
             }
-
-            routines.add(new Routine(snapshot.getKey(), totalMinutes));
-
+          } catch (NullPointerException e) {
+            //do nothing
           }
-          dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ROUTINES, routines);
-          //rxDataSource.updateDataSet(routines).updateAdapter();
-          //dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ERROR, e);
-        //}
+          routines.add(new Routine(snapshot.getKey(), totalMinutes));
+        }
+        dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ROUTINES, routines);
       }
 
       @Override public void onCancelled(FirebaseError firebaseError) {

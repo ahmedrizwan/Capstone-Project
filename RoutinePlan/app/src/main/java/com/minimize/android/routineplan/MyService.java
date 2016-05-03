@@ -1,5 +1,6 @@
 package com.minimize.android.routineplan;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -7,6 +8,7 @@ import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.widget.TextView;
+import br.com.goncalves.pugnotification.notification.PugNotification;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
@@ -104,6 +106,8 @@ public class MyService extends Service {
     if (mCurrentState == STOPPED) {
       mCurrentState = PLAYING;
       countDownTimer(currentTask);
+
+
     }
   }
 
@@ -127,6 +131,16 @@ public class MyService extends Service {
         }
       };
       mCountDownTimer.start();
+      PugNotification.with(this)
+          .load()
+          .title("Playing Routine")
+          .message(mTasks.get(currentTask).getName())
+          .bigTextStyle("Playing Routine")
+          .smallIcon(R.drawable.ic_play)
+          .largeIcon(R.drawable.ic_play)
+          .flags(Notification.DEFAULT_ALL)
+          .simple()
+          .build();
       if (taskIndex + 1 < mTasks.size()) {
         mOnTaskStarted.onTaskStarted(mTasks.get(taskIndex), mTasks.get(taskIndex + 1));
       } else {
