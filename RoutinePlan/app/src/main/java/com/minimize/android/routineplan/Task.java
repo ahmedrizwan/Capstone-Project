@@ -6,14 +6,6 @@ package com.minimize.android.routineplan;
 public class Task {
   String name;
 
-  public String getTime() {
-    return time;
-  }
-
-  public void setTime(String time) {
-    this.time = time;
-  }
-
   public String getName() {
 
     return name;
@@ -23,10 +15,18 @@ public class Task {
     this.name = name;
   }
 
-  String time;
+  public int getMinutes() {
+    return minutes;
+  }
 
-  public Task(String name, String time) {
+  public void setMinutes(int minutes) {
+    this.minutes = minutes;
+  }
+
+  int minutes;
+
+  public Task(String name, int minutes) {
     this.name = name;
-    this.time = time;
+    this.minutes = minutes;
   }
 }

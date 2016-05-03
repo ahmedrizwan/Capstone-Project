@@ -5,12 +5,13 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.minimize.android.routineplan.App;
+import com.minimize.android.routineplan.Routine;
 import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
 import com.pixplicity.easyprefs.library.Prefs;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import timber.log.Timber;
 
 public class ActionsCreator implements MyActions {
 
@@ -34,16 +35,22 @@ public class ActionsCreator implements MyActions {
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
     routinesRef.addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
-        try {
-          List<String> routines = new ArrayList<String>();
+          List<Routine> routines = new ArrayList<Routine>();
           for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            routines.add(snapshot.getKey());
+            int totalMinutes = 0;
+            HashMap values = (HashMap) snapshot.getValue();
+            HashMap tasks = (HashMap) values.get("Tasks");
+            for (Object minutes : tasks.values()) {
+              totalMinutes += ((Long) minutes).intValue();
+            }
+
+            routines.add(new Routine(snapshot.getKey(), totalMinutes));
+
           }
           dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ROUTINES, routines);
           //rxDataSource.updateDataSet(routines).updateAdapter();
-        } catch (NullPointerException e) {
-          dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ERROR, e);
-        }
+          //dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ERROR, e);
+        //}
       }
 
       @Override public void onCancelled(FirebaseError firebaseError) {
@@ -60,7 +67,7 @@ public class ActionsCreator implements MyActions {
         try {
           List<Task> tasks = new ArrayList<>();
           for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            tasks.add(new Task(snapshot.getKey().toString(), snapshot.getValue().toString()));
+            tasks.add(new Task(snapshot.getKey().toString(), ((Long) snapshot.getValue()).intValue()));
           }
           dispatcher.dispatch(MyActions.GET_TASKS, Keys.TASKS, tasks);
           //rxDataSource.updateDataSet(routines).updateAdapter();
@@ -79,7 +86,7 @@ public class ActionsCreator implements MyActions {
   @Override public void createTask(String routine, Task task, int priority) {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
-    routinesRef.child(routine).child("Tasks").child(task.getName()).setValue(task.getTime());
+    routinesRef.child(routine).child("Tasks").child(task.getName()).setValue(task.getMinutes());
   }
 
   @Override public void updateTasks(String routine, List<Task> tasks) {
@@ -88,7 +95,6 @@ public class ActionsCreator implements MyActions {
     for (int i = 0; i < tasks.size(); i++) {
       routinesRef.child(tasks.get(i).getName()).setPriority(i + 1);
     }
-    Timber.e("updateTasks : Here");
   }
 
   @Override public void createRoutine(String name, int priority) {
@@ -101,14 +107,14 @@ public class ActionsCreator implements MyActions {
     String user = Prefs.getString(App.USER, null);
     final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
     if (oldTask.getName().equals(newTask.getName())) {
-      if (oldTask.getTime().equals(newTask.getTime())) {
+      if (oldTask.getMinutes() == newTask.getMinutes()) {
         return;
       } else {
-        routinesRef.child(oldTask.getName()).setValue(newTask.getTime(), position+1);
+        routinesRef.child(oldTask.getName()).setValue(newTask.getMinutes(), position + 1);
       }
     } else {
       routinesRef.child(oldTask.getName()).removeValue();
-      routinesRef.child(newTask.getName()).setValue(newTask.getTime(), position+1);
+      routinesRef.child(newTask.getName()).setValue(newTask.getMinutes(), position + 1);
     }
     dispatcher.dispatch(MyActions.UPDATE_TASK, Keys.TASK, newTask);
   }

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.Task;
+import com.minimize.android.routineplan.activity.TasksActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +40,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   @Override public void onBindViewHolder(final ItemViewHolder holder, final int position) {
     final Task task = mItems.get(position);
     holder.textViewTaskName.setText(task.getName());
-    holder.textViewTaskTime.setText(task.getTime());
+    holder.textViewTaskTime.setText(TasksActivity.convertMinutesToString(task.getMinutes()));
 
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {

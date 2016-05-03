@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
+import com.minimize.android.routineplan.Routine;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.databinding.FragmentRoutinesBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
@@ -32,8 +33,8 @@ public class RoutinesFragment extends BaseFragment {
   FragmentRoutinesBinding mBinding;
 
   RoutinesStore mRoutinesStore;
-  RxDataSource<String> rxDataSource;
-  private List<String> mRoutines;
+  RxDataSource<Routine> rxDataSource;
+  private List<Routine> mRoutines;
 
   @Nullable @Override public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
       @Nullable final Bundle savedInstanceState) {
@@ -43,25 +44,27 @@ public class RoutinesFragment extends BaseFragment {
 
     mRoutinesStore = RoutinesStore.get(mDispatcher);
 
-    rxDataSource = new RxDataSource<>(Collections.<String>emptyList());
+    rxDataSource = new RxDataSource<>(Collections.<Routine>emptyList());
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
-        new Action1<SimpleViewHolder<String, ItemRoutineBinding>>() {
-          @Override public void call(final SimpleViewHolder<String, ItemRoutineBinding> viewHolder) {
+        new Action1<SimpleViewHolder<Routine, ItemRoutineBinding>>() {
+          @Override public void call(final SimpleViewHolder<Routine, ItemRoutineBinding> viewHolder) {
             final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
-            final String item = viewHolder.getItem();
-            viewDataBinding.textViewRoutineName.setText(item);
+            final Routine item = viewHolder.getItem();
+            viewDataBinding.textViewRoutineName.setText(item.getName());
+            if (item.getTotalMinutes() > 0) {
+              viewDataBinding.textViewTaskTime.setText(TasksActivity.convertMinutesToString(item.getTotalMinutes()));
+            }
             View root = viewDataBinding.getRoot();
             root.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
                 Intent intent = new Intent(getContext(), TasksActivity.class);
-                intent.putExtra("Routine", item);
+                intent.putExtra("Routine", item.getName());
                 startActivity(intent);
               }
             });
             root.setOnLongClickListener(new View.OnLongClickListener() {
               @Override public boolean onLongClick(View v) {
-                new MaterialDialog.Builder(getContext())
-                    .title("Edit Routine")
+                new MaterialDialog.Builder(getContext()).title("Edit Routine")
                     .items(Arrays.asList("Rename"))
                     .itemsCallback(new MaterialDialog.ListCallback() {
                       @Override
@@ -73,7 +76,7 @@ public class RoutinesFragment extends BaseFragment {
                                 @Override public void onInput(MaterialDialog dialog, CharSequence input) {
                                   // Do something
                                   if (input.length() > 0) {
-                                    mActionsCreator.renameRoutine(item, input.toString().trim());
+                                    mActionsCreator.renameRoutine(item.getName(), input.toString().trim());
                                   }
                                 }
                               })

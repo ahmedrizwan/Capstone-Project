@@ -1,5 +1,6 @@
 package com.minimize.android.routineplan.flux.stores;
 
+import com.minimize.android.routineplan.Routine;
 import com.minimize.android.routineplan.Utility;
 import com.minimize.android.routineplan.flux.actions.Action;
 import com.minimize.android.routineplan.flux.actions.Keys;
@@ -7,7 +8,6 @@ import com.minimize.android.routineplan.flux.actions.MyActions;
 import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
 import com.squareup.otto.Subscribe;
 import java.util.List;
-import timber.log.Timber;
 
 /**
  * Created by ahmedrizwan on 21/04/2016.
@@ -28,14 +28,13 @@ public class RoutinesStore extends Store{
   }
 
   @Subscribe @Override public void onAction(Action action) {
-    Timber.e("onAction : Hereeeee!");
     String errorMessage = "";
     switch (action.getType()) {
       case MyActions.GET_ROUTINES:
         //noinspection unchecked
         errorMessage = Utility.checkForErrorResponse(action);
         if (errorMessage.equals("")) {
-          List<String> routines = (List<String>) action.getData().get(Keys.ROUTINES);
+          List<Routine> routines = (List<Routine>) action.getData().get(Keys.ROUTINES);
           emitStoreChange(new RoutinesEvent(routines));
         } else {
           emitStoreChange(new RoutinesError(errorMessage));
@@ -54,9 +53,9 @@ public class RoutinesStore extends Store{
   }
 
   public class RoutinesEvent implements StoreChangeEvent {
-    public List<String> routinesList;
+    public List<Routine> routinesList;
 
-    public RoutinesEvent(List<String> routinesList) {
+    public RoutinesEvent(List<Routine> routinesList) {
       this.routinesList = routinesList;
     }
   }

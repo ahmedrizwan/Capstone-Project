@@ -29,6 +29,7 @@ import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
 import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
 import com.minimize.android.routineplan.itemhelper.SimpleItemTouchHelperCallback;
 import com.squareup.otto.Subscribe;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -50,11 +51,14 @@ public class TasksActivity extends BaseActivity {
 
   private Timer mTimer;
   private String mRoutine;
+  int[] mMinutes = { 30, 60, 90, 120, 150, 180 };
+  String[] mDisplayValues = new String[mMinutes.length];
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
     mBinding.recyclerViewRoutines.setLayoutManager(new LinearLayoutManager(this));
+    mDisplayValues = convertMinutesToStrings(mMinutes);
 
     mTasksStore = TasksStore.get(mDispatcher);
     mRoutinesStore = RoutinesStore.get(mDispatcher);
@@ -81,11 +85,12 @@ public class TasksActivity extends BaseActivity {
             new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         numberPicker.setLayoutParams(params);
-        String[] displayedValues = { "30 Mins", "1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours" };
-        numberPicker.setDisplayedValues(displayedValues);
+
+        numberPicker.setDisplayedValues(mDisplayValues);
+
         numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(displayedValues.length - 1);
-        numberPicker.setValue(Arrays.asList(displayedValues).indexOf(oldTask.getTime()));
+        numberPicker.setMaxValue(mMinutes.length - 1);
+        numberPicker.setValue(Arrays.asList(mDisplayValues).indexOf(convertMinutesToString(oldTask.getMinutes())));
 
         LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -100,7 +105,7 @@ public class TasksActivity extends BaseActivity {
               @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
                 String taskName = editTextTaskName.getText().toString();
-                Task task = new Task(taskName, time);
+                Task task = new Task(taskName, convertStringToMinutes(time));
                 if (taskName.length() > 0) {
                   //mActionsCreator.upd(mRoutine, task, mTasks.size());
                   mActionsCreator.updateTask(mRoutine, oldTask, task, position);
@@ -146,10 +151,11 @@ public class TasksActivity extends BaseActivity {
             new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         numberPicker.setLayoutParams(params);
-        String[] displayedValues = { "30 Mins", "1 Hour", "1.5 Hours", "2 Hours", "2.5 Hours", "3 Hours" };
-        numberPicker.setDisplayedValues(displayedValues);
+
+        numberPicker.setDisplayedValues(convertMinutesToStrings(mMinutes));
+
         numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(displayedValues.length - 1);
+        numberPicker.setMaxValue(mMinutes.length - 1);
         LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(editTextTaskName);
@@ -163,7 +169,7 @@ public class TasksActivity extends BaseActivity {
               @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
                 String taskName = editTextTaskName.getText().toString();
-                Task task = new Task(taskName, time);
+                Task task = new Task(taskName, convertStringToMinutes(time));
                 if (taskName.length() > 0) {
                   mActionsCreator.createTask(mRoutine, task, mTasks.size());
                 }
@@ -184,6 +190,48 @@ public class TasksActivity extends BaseActivity {
     });
     mActionsCreator.getTasks(mRoutine);
     mActionsCreator.getBreakInterval(mRoutine);
+  }
+
+  public static String convertMinutesToString(int minutes) {
+    String displayValue = "";
+    DecimalFormat decimalFormat = new DecimalFormat("#.#");
+    if (minutes < 60) {
+      //30 Mins
+      displayValue = String.valueOf(minutes) + " Mins";
+    } else {
+      float value = (float) minutes / 60;
+      if (value == 1) {
+        displayValue = String.valueOf(decimalFormat.format(value)) + " Hour";
+      } else {
+        displayValue = String.valueOf(decimalFormat.format(value)) + " Hours";
+      }
+    }
+    return displayValue;
+  }
+
+  public int convertStringToMinutes(String time) {
+    int index = Arrays.asList(mDisplayValues).indexOf(time);
+
+    return mMinutes[index];
+  }
+
+  public String[] convertMinutesToStrings(int[] minutes) {
+    String[] valuesAsString = new String[minutes.length];
+    DecimalFormat decimalFormat = new DecimalFormat("#.#");
+    for (int i = 0; i < minutes.length; i++) {
+      if (minutes[i] < 60) {
+        //30 Mins
+        valuesAsString[i] = String.valueOf(minutes[i]) + " Mins";
+      } else {
+        float value = (float) minutes[i] / 60;
+        if (value == 1) {
+          valuesAsString[i] = String.valueOf(decimalFormat.format(value)) + " Hour";
+        } else {
+          valuesAsString[i] = String.valueOf(decimalFormat.format(value)) + " Hours";
+        }
+      }
+    }
+    return valuesAsString;
   }
 
   @Override protected void onResume() {
@@ -225,6 +273,7 @@ public class TasksActivity extends BaseActivity {
   @Subscribe public void onTaskUpdate(TasksStore.TaskUpdateEvent taskUpdateEvent) {
     mActionsCreator.getTasks(mRoutine);
   }
+
   @Subscribe public void onRoutineRename(RoutinesStore.RoutineRenameEvent routineRenameEvent) {
     mRoutine = routineRenameEvent.mNewName;
     ActionBar supportActionBar = getSupportActionBar();
