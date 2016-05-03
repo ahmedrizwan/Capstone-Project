@@ -1,14 +1,15 @@
 package com.minimize.android.routineplan;
 
-import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
-import br.com.goncalves.pugnotification.notification.PugNotification;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
@@ -17,6 +18,8 @@ import timber.log.Timber;
 public class MyService extends Service {
   //State Related Stuff
   @RoutineState int mCurrentState = STOPPED;
+  private NotificationManager mNotificationManager;
+  private NotificationCompat.Builder mNotifyBuilder;
 
   public void setTextViews(TextView textViewPlayingTask, TextView textViewNextTask) {
     Task task = mTasks.get(currentTask);
@@ -101,21 +104,25 @@ public class MyService extends Service {
     return routine;
   }
 
-
   public void start() {
     if (mCurrentState == STOPPED) {
       mCurrentState = PLAYING;
       countDownTimer(currentTask);
-
-
     }
   }
 
+  int notifyID = 1;
+  long timeRemaining = 0;
+
   private void countDownTimer(final int taskIndex) {
     if (mTasks.size() > 0) {
+
       mCountDownTimer = new CountDownTimerPausable(mTasks.get(taskIndex).getMinutes() * 60 * 1000, 1000) {
         @Override public void onTick(long millisUntilFinished) {
-          mOnTimeTick.onTimeTick(millisUntilFinished / 1000);
+          timeRemaining = millisUntilFinished / 1000;
+          mOnTimeTick.onTimeTick(timeRemaining);
+          mNotifyBuilder.setContentText(mTasks.get(currentTask).getName() +" - "+timeRemaining);
+          mNotificationManager.notify(notifyID, mNotifyBuilder.build());
         }
 
         @Override public void onFinish() {
@@ -131,16 +138,11 @@ public class MyService extends Service {
         }
       };
       mCountDownTimer.start();
-      PugNotification.with(this)
-          .load()
-          .title("Playing Routine")
-          .message(mTasks.get(currentTask).getName())
-          .bigTextStyle("Playing Routine")
-          .smallIcon(R.drawable.ic_play)
-          .largeIcon(R.drawable.ic_play)
-          .flags(Notification.DEFAULT_ALL)
-          .simple()
-          .build();
+      mNotifyBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.ic_play)
+          .setContentTitle("Playing Routine")
+          .setContentText(mTasks.get(currentTask).getName() +" - "+timeRemaining);
+      mNotifyBuilder.build();
+
       if (taskIndex + 1 < mTasks.size()) {
         mOnTaskStarted.onTaskStarted(mTasks.get(taskIndex), mTasks.get(taskIndex + 1));
       } else {
@@ -153,9 +155,9 @@ public class MyService extends Service {
     return sMyService;
   }
 
-
   @Override public void onCreate() {
     sMyService = this;
+    mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     Timber.e("Service Created");
   }
 
