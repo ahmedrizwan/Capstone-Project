@@ -1,7 +1,12 @@
 package com.minimize.android.routineplan;
 
 import android.app.Application;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.provider.Settings;
 import com.firebase.client.Firebase;
 import com.minimize.android.routineplan.flux.actions.ActionsCreator;
@@ -24,8 +29,38 @@ public class App extends Application {
     return mFirebaseRef;
   }
 
+  private MyService mMyService;
+  private boolean mServiceBound;
+
+  /** Defines callbacks for service binding, passed to bindService() */
+  private ServiceConnection mConnection = new ServiceConnection() {
+
+    @Override public void onServiceConnected(ComponentName className, IBinder service) {
+      // We've bound to LocalService, cast the IBinder and get LocalService instance
+      MyService.LocalBinder binder = (MyService.LocalBinder) service;
+      mMyService = binder.getService();
+      mServiceBound = true;
+    }
+
+    @Override public void onServiceDisconnected(ComponentName arg0) {
+      mServiceBound = false;
+    }
+  };
+
+  public MyService getServiceInstance() {
+    return mMyService;
+  }
+
+  public boolean isServiceBound() {
+    return mServiceBound;
+  }
+
   @Override public void onCreate() {
     super.onCreate();
+    //Bind Service to the App
+    Intent intent = new Intent(this, MyService.class);
+    bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
     Firebase.setAndroidContext(this);
     Firebase.getDefaultConfig().setPersistenceEnabled(true);
     mFirebaseRef = new Firebase("https://routineplan.firebaseio.com/");

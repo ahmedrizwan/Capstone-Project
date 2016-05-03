@@ -12,9 +12,11 @@ import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.Routine;
+import com.minimize.android.routineplan.activity.PlayActivity;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.databinding.FragmentRoutinesBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
+import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
@@ -53,7 +55,16 @@ public class RoutinesFragment extends BaseFragment {
             viewDataBinding.textViewRoutineName.setText(item.getName());
             if (item.getTotalMinutes() > 0) {
               viewDataBinding.textViewTaskTime.setText(TasksActivity.convertMinutesToString(item.getTotalMinutes()));
+            } else {
+              viewDataBinding.imageViewPlayRoutine.setVisibility(View.GONE);
             }
+
+            viewDataBinding.imageViewPlayRoutine.setOnClickListener(new View.OnClickListener() {
+              @Override public void onClick(View v) {
+                startRoutine(item);
+              }
+            });
+
             View root = viewDataBinding.getRoot();
             root.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
@@ -108,15 +119,21 @@ public class RoutinesFragment extends BaseFragment {
       }
     });
 
-    mActionsCreator.getRoutines();
-
     return mBinding.getRoot();
+  }
+
+  private void startRoutine(Routine item) {
+    Intent intent = new Intent(getContext(), PlayActivity.class);
+    intent.putExtra(Keys.ROUTINE, item.getName());
+
+    startActivity(intent);
   }
 
   @Override public void onResume() {
     super.onResume();
     mDispatcher.register(this);
     mDispatcher.register(mRoutinesStore);
+    mActionsCreator.getRoutines();
   }
 
   @Override public void onPause() {

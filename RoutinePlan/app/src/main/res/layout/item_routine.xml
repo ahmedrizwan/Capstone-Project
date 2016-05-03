@@ -14,10 +14,10 @@
         android:id="@+id/text_view_routine_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Test"
         android:fontFamily="sans-serif-light"
-        android:textSize="22sp"
         android:textColor="@android:color/black"
+        android:textSize="22sp"
+        tools:text="Test"
         />
 
     <TextView
@@ -27,6 +27,17 @@
         android:layout_below="@id/text_view_routine_name"
         android:fontFamily="sans-serif-light"
         android:text="@string/tap_to_add_tasks"
+        />
+
+    <ImageView
+        android:id="@+id/image_view_play_routine"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_alignBottom="@id/text_view_task_time"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/text_view_routine_name"
+        android:src="@drawable/ic_play"
         />
   </RelativeLayout>
 </layout>
