@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+import android.view.View;
 import com.minimize.android.routineplan.App;
 import com.minimize.android.routineplan.MyService;
 import com.minimize.android.routineplan.OnTaskStarted;
@@ -35,7 +36,7 @@ public class PlayActivity extends BaseActivity {
 
     ActionBar supportActionBar = getSupportActionBar();
     if (supportActionBar != null) {
-      supportActionBar.setTitle("Playing: " + mRoutineName);
+      supportActionBar.setTitle("Playing: " + mRoutineName+" Routine");
       supportActionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -44,13 +45,56 @@ public class PlayActivity extends BaseActivity {
       mService = application.getServiceInstance();
       if (mService.getRoutineName().equals(mRoutineName)) {
         Timber.e("onCreate : Routine already running");
+        mService.setOnTimeTick(new OnTimeTick() {
+          @Override public void onTimeTick(long seconds) {
+            mBinding.textViewTimer.setText(seconds + "");
+          }
+        });
+
+        mService.setOnTaskStarted(new OnTaskStarted() {
+          @Override public void onTaskStarted(Task currentTask, Task nextTask) {
+            if (nextTask != null) {
+              mBinding.textViewNextTask.setText("Next Task: " + nextTask.getName());
+            } else {
+              mBinding.textViewNextTask.setText("None");
+            }
+            if (currentTask != null) {
+              mBinding.textViewPlayingTask.setText(currentTask.getName());
+            } else {
+              mBinding.textViewTimer.setText("00:00");
+              finish();
+            }
+          }
+        });
+
+        mService.setTextViews(mBinding.textViewPlayingTask, mBinding.textViewNextTask);
       } else {
         mActionsCreator.getTasks(mRoutineName);
       }
-    } else {
-      Timber.e("onCreate : Service not bound bro!");
-    }
+      mBinding.buttonPause.setOnClickListener(new View.OnClickListener() {
+        @Override public void onClick(View v) {
+          if (mService.getRoutineState(mRoutineName) == MyService.PLAYING) {
+            mService.pauseRoutine();
+            mBinding.buttonPause.setText("Resume");
+          } else {
+            mService.resumeRoutine();
+            mBinding.buttonPause.setText("Pause");
+          }
+        }
+      });
 
+      setPauseButtonState();
+
+      mBinding.buttonCancel.setOnClickListener(new View.OnClickListener() {
+        @Override public void onClick(View v) {
+          mService.stopRoutine();
+          finish();
+        }
+      });
+
+    } else {
+      Timber.e("onCreate : Service not bound bruh!");
+    }
   }
 
   @Override protected void onResume() {
@@ -93,6 +137,16 @@ public class PlayActivity extends BaseActivity {
     });
 
     mService.start();
+
+    setPauseButtonState();
+  }
+
+  private void setPauseButtonState() {
+    if (mService.getRoutineState(mRoutineName) == MyService.PLAYING) {
+      mBinding.buttonPause.setText("Pause");
+    } else {
+      mBinding.buttonPause.setText("Resume");
+    }
   }
 
   @Override public boolean onOptionsItemSelected(MenuItem item) {

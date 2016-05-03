@@ -3,37 +3,89 @@ package com.minimize.android.routineplan;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.widget.TextView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import timber.log.Timber;
 
 public class MyService extends Service {
+  //State Related Stuff
+  @RoutineState int mCurrentState = STOPPED;
 
-  private static MyService sMyService;
-  private List<Task> mTasks;
+  public void setTextViews(TextView textViewPlayingTask, TextView textViewNextTask) {
+    Task task = mTasks.get(currentTask);
+    if (task != null) {
+      textViewPlayingTask.setText(task.getName());
+    }
+    if (currentTask + 1 < mTasks.size()) {
+      textViewNextTask.setText(mTasks.get(currentTask + 1).getName());
+    }
+  }
+
+  public void stopRoutine() {
+    mCurrentState = STOPPED;
+    mTasks.clear();
+    mCountDownTimer.cancel();
+    routine = "";
+  }
+
+  @IntDef({ PLAYING, PAUSED, STOPPED })
+
+  @Retention(RetentionPolicy.SOURCE) public @interface RoutineState {
+  }
+
+  public static final int STOPPED = 0;
+  public static final int PLAYING = 1;
+  public static final int PAUSED = 2;
+
+  @RoutineState public int getRoutineState(String routineName) {
+    return mCurrentState;
+  }
+
+  public void setRoutineState(@RoutineState int state) {
+    mCurrentState = state;
+  }
+
+  private int currentTask = 0;
+
   private String routine = "";
+  //Some Vars
+  private static MyService sMyService;
+
+  private List<Task> mTasks;
 
   //Callbacks
   private OnTimeTick mOnTimeTick;
+
+  private OnTaskStarted mOnTaskStarted;
 
   public void setOnTaskStarted(OnTaskStarted onTaskStarted) {
     mOnTaskStarted = onTaskStarted;
   }
 
-  private OnTaskStarted mOnTaskStarted;
-
   public void setOnTimeTick(OnTimeTick onTimeTick) {
     mOnTimeTick = onTimeTick;
   }
 
-  private int currentTask = 0;
+  public void pauseRoutine() {
+    if (mCurrentState == PLAYING) {
+      mCurrentState = PAUSED;
+      mCountDownTimer.pause();
+    }
+  }
 
-  private CountDownTimer mCountDownTimer;
+  public void resumeRoutine() {
+    if (mCurrentState == PAUSED) {
+      mCurrentState = PLAYING;
+      mCountDownTimer.start();
+    }
+  }
+
+  private CountDownTimerPausable mCountDownTimer;
 
   public void setTasks(List<Task> tasks) {
     mTasks = tasks;
@@ -47,24 +99,6 @@ public class MyService extends Service {
     return routine;
   }
 
-  @RoutineState int mCurrentState = STOPPED;
-
-  @IntDef({ PLAYING, PAUSED, STOPPED })
-
-  @Retention(RetentionPolicy.SOURCE) public @interface RoutineState {
-  }
-
-  public static final int STOPPED = 0;
-  public static final int PLAYING = 1;
-  public static final int PAUSED = 2;
-
-  @RoutineState public int getRoutineState() {
-    return mCurrentState;
-  }
-
-  public void setRoutineState(@RoutineState int state) {
-    mCurrentState = state;
-  }
 
   public void start() {
     if (mCurrentState == STOPPED) {
@@ -75,7 +109,7 @@ public class MyService extends Service {
 
   private void countDownTimer(final int taskIndex) {
     if (mTasks.size() > 0) {
-      mCountDownTimer = new CountDownTimer(mTasks.get(taskIndex).getMinutes() * 60 * 1000, 1000) {
+      mCountDownTimer = new CountDownTimerPausable(mTasks.get(taskIndex).getMinutes() * 60 * 1000, 1000) {
         @Override public void onTick(long millisUntilFinished) {
           mOnTimeTick.onTimeTick(millisUntilFinished / 1000);
         }
@@ -88,6 +122,7 @@ public class MyService extends Service {
           } else {
             //means everything ended
             mOnTaskStarted.onTaskStarted(null, null);
+            mCurrentState = STOPPED;
           }
         }
       };
@@ -103,6 +138,7 @@ public class MyService extends Service {
   public static MyService getInstance() {
     return sMyService;
   }
+
 
   @Override public void onCreate() {
     sMyService = this;
