@@ -24,6 +24,7 @@ import com.squareup.otto.Subscribe;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.parceler.Parcels;
 import rx.functions.Action1;
 import timber.log.Timber;
 
@@ -124,8 +125,7 @@ public class RoutinesFragment extends BaseFragment {
 
   private void startRoutine(Routine item) {
     Intent intent = new Intent(getContext(), PlayActivity.class);
-    intent.putExtra(Keys.ROUTINE, item.getName());
-
+    intent.putExtra(Keys.ROUTINE, Parcels.wrap(item));
     startActivity(intent);
   }
 

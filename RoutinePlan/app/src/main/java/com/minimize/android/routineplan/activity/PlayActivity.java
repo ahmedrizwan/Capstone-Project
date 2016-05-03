@@ -10,12 +10,14 @@ import com.minimize.android.routineplan.MyService;
 import com.minimize.android.routineplan.OnTaskStarted;
 import com.minimize.android.routineplan.OnTimeTick;
 import com.minimize.android.routineplan.R;
+import com.minimize.android.routineplan.Routine;
 import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityPlayBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
 import com.squareup.otto.Subscribe;
 import java.util.List;
+import org.parceler.Parcels;
 import timber.log.Timber;
 
 /**
@@ -24,26 +26,27 @@ import timber.log.Timber;
 public class PlayActivity extends BaseActivity {
 
   ActivityPlayBinding mBinding;
-  String mRoutineName;
+  Routine mRoutine;
   TasksStore mTasksStore;
   private MyService mService;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_play);
-    mRoutineName = getIntent().getStringExtra(Keys.ROUTINE);
     mTasksStore = TasksStore.get(mDispatcher);
+    mRoutine = Parcels.unwrap(getIntent().getParcelableExtra(Keys.ROUTINE));
 
     ActionBar supportActionBar = getSupportActionBar();
     if (supportActionBar != null) {
-      supportActionBar.setTitle("Playing: " + mRoutineName+" Routine");
+      supportActionBar.setTitle("Playing: " + mRoutine.getName()+" Routine");
       supportActionBar.setDisplayHomeAsUpEnabled(true);
     }
+    Timber.e("onCreate : Break Interval " + mRoutine.getBreakInterval());
 
     App application = (App) getApplication();
     if (application.isServiceBound()) {
       mService = application.getServiceInstance();
-      if (mService.getRoutineName().equals(mRoutineName)) {
+      if (mService.getRoutineName().equals(mRoutine.getName())) {
         Timber.e("onCreate : Routine already running");
         mService.setOnTimeTick(new OnTimeTick() {
           @Override public void onTimeTick(long seconds) {
@@ -69,11 +72,11 @@ public class PlayActivity extends BaseActivity {
 
         mService.setTextViews(mBinding.textViewPlayingTask, mBinding.textViewNextTask);
       } else {
-        mActionsCreator.getTasks(mRoutineName);
+        mActionsCreator.getTasks(mRoutine.getName());
       }
       mBinding.buttonPause.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {
-          if (mService.getRoutineState(mRoutineName) == MyService.PLAYING) {
+          if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
             mService.pauseRoutine();
             mBinding.buttonPause.setText("Resume");
           } else {
@@ -112,7 +115,7 @@ public class PlayActivity extends BaseActivity {
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
 
     List<Task> tasks = tasksEvent.mTasks;
-    mService.setRoutine(mRoutineName);
+    mService.setRoutine(mRoutine.getName());
     mService.setTasks(tasks);
     mService.setOnTimeTick(new OnTimeTick() {
       @Override public void onTimeTick(long seconds) {
@@ -142,7 +145,8 @@ public class PlayActivity extends BaseActivity {
   }
 
   private void setPauseButtonState() {
-    if (mService.getRoutineState(mRoutineName) == MyService.PLAYING) {
+    if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
+
       mBinding.buttonPause.setText("Pause");
     } else {
       mBinding.buttonPause.setText("Resume");

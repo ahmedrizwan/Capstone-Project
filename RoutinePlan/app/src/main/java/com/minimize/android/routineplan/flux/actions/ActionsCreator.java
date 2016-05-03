@@ -38,8 +38,11 @@ public class ActionsCreator implements MyActions {
         List<Routine> routines = new ArrayList<Routine>();
         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
           int totalMinutes = 0;
+          int breakInterval = 5;
+          HashMap values = (HashMap) snapshot.getValue();
+          breakInterval = ((Long) values.get("Break")).intValue();
+
           try {
-            HashMap values = (HashMap) snapshot.getValue();
             HashMap tasks = (HashMap) values.get("Tasks");
             for (Object minutes : tasks.values()) {
               totalMinutes += ((Long) minutes).intValue();
@@ -47,7 +50,7 @@ public class ActionsCreator implements MyActions {
           } catch (NullPointerException e) {
             //do nothing
           }
-          routines.add(new Routine(snapshot.getKey(), totalMinutes));
+          routines.add(new Routine(snapshot.getKey(), totalMinutes, breakInterval));
         }
         dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ROUTINES, routines);
       }
