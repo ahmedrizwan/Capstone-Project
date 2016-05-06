@@ -45,4 +45,7 @@ public interface MyActions {
   void login(String userEmail);
 
   void saveHistory(String routine, Task task, String date, String time);
+
+  void getHistory();
+
 }

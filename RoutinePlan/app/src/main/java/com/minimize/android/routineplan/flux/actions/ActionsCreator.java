@@ -7,11 +7,13 @@ import com.firebase.client.ValueEventListener;
 import com.minimize.android.routineplan.App;
 import com.minimize.android.routineplan.Routine;
 import com.minimize.android.routineplan.Task;
+import com.minimize.android.routineplan.TimeAndInfo;
 import com.minimize.android.routineplan.flux.dispatcher.Dispatcher;
 import com.pixplicity.easyprefs.library.Prefs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import timber.log.Timber;
 
 public class ActionsCreator implements MyActions {
 
@@ -163,9 +165,46 @@ public class ActionsCreator implements MyActions {
 
   @Override public void saveHistory(String routine, Task task, String date, String time) {
     final String user = Prefs.getString(App.USER, null);
-    final Firebase historyRef = new Firebase(BASE_URL + "/" + user+"/History");
-    historyRef.child(date).child(time).child(routine).setValue(task.getName());
-    historyRef.child(date).child(time).child("Time").setValue(task.getMinutes());
+    final Firebase historyRef = new Firebase(BASE_URL + "/" + user + "/History");
+    historyRef.child(date + " " + time).child(routine).setValue(task.getName());
+    historyRef.child(date + " " + time).child("Time").setValue(task.getMinutes());
+  }
+
+  @Override public void getHistory() {
+    final String user = Prefs.getString(App.USER, null);
+    final Firebase historyRef = new Firebase(BASE_URL + "/" + user + "/History");
+    historyRef.addValueEventListener(new ValueEventListener() {
+      @Override public void onDataChange(DataSnapshot dataSnapshot) {
+        List<TimeAndInfo> timeAndInfos = new ArrayList<>();
+        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+          TimeAndInfo timeAndInfo = new TimeAndInfo();
+
+          timeAndInfo.setDateAndTime(snapshot.getKey());
+
+          for (DataSnapshot info : snapshot.getChildren()) {
+              if (info.getKey().equals("Time")) {
+                timeAndInfo.setTime((long) info.getValue());
+                Timber.e("onDataChange : "+timeAndInfo.getTime());
+              } else {
+                timeAndInfo.setRoutine(info.getKey());
+                timeAndInfo.setTaskName((String) info.getValue());
+                Timber.e("onDataChange : "+timeAndInfo.getRoutine());
+              }
+
+          }
+          timeAndInfos.add(timeAndInfo);
+
+
+        }
+        Timber.e("onDataChange : " + timeAndInfos.size());
+
+        dispatcher.dispatch(MyActions.GET_HISTORY, Keys.HISTORY, timeAndInfos);
+      }
+
+      @Override public void onCancelled(FirebaseError firebaseError) {
+
+      }
+    });
   }
 
   private String getTasksUrl(String user, String routine) {
@@ -214,5 +253,4 @@ public class ActionsCreator implements MyActions {
       }
     });
   }
-
 }

@@ -13,4 +13,5 @@ public interface Keys {
   String LOGGED_IN = "logged_in";
   String NAME = "name";
   String PHOTO_URL = "photo_url";
+  String HISTORY = "get_history";
 }
