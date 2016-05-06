@@ -8,11 +8,9 @@
       android:orientation="vertical"
       >
 
-    <Button
-        android:id="@+id/buttonPanel"
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="User"
-        />
+        android:layout_height="wrap_content" />
   </LinearLayout>
 </layout>

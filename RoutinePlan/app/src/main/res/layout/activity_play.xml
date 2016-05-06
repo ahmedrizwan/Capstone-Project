@@ -5,44 +5,45 @@
     >
 
   <LinearLayout
+      android:id="@+id/layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
-      android:id="@+id/layout"
       >
 
     <TextView
+        android:id="@+id/text_view_playing_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_view_playing_task"
-        tools:text="Currently Playing Task"/>
+        tools:text="Currently Playing Task"
+        />
 
     <TextView
+        android:id="@+id/text_view_time_remaining"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Time Remaining"
-        android:id="@+id/text_view_time_remaining"
         />
-    
+
     <TextView
+        android:id="@+id/text_view_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="00:00:00"
-        android:id="@+id/text_view_timer"
         />
-    
+
     <TextView
+        android:id="@+id/text_view_next_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Next task: "
-        android:id="@+id/text_view_next_task"
         />
 
     <Button
+        android:id="@+id/button_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel"
-        android:id="@+id/button_cancel"
         />
 
     <Button

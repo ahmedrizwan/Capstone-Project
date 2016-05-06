@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
+
   <android.support.design.widget.CoordinatorLayout
+      android:id="@+id/coordinator_layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:id="@+id/coordinator_layout"
       >
 
     <LinearLayout
@@ -14,23 +14,26 @@
         android:orientation="vertical"
 
         >
+
       <RadioGroup
+          android:id="@+id/radio_group_break"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:padding="16dp"
-          android:id="@+id/radio_group_break"
           >
+
         <RadioButton
+            android:id="@+id/radio_five_minutes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5 Mins"
-            android:id="@+id/radio_five_minutes"
             />
+
         <RadioButton
+            android:id="@+id/radio_ten_minutes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="10 Mins"
-            android:id="@+id/radio_ten_minutes"
             />
       </RadioGroup>
 
@@ -38,17 +41,16 @@
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:gravity="center"
-          android:visibility="gone"
           android:text="@string/display_no_tasks"
+          android:visibility="gone"
           />
 
       <android.support.v7.widget.RecyclerView
+          android:id="@+id/recycler_view_routines"
           android:layout_width="match_parent"
           android:layout_height="0dp"
           android:layout_weight="1"
-          android:id="@+id/recycler_view_routines"
           />
-
 
 
     </LinearLayout>

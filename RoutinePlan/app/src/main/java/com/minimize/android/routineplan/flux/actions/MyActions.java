@@ -12,6 +12,14 @@ public interface MyActions {
   String RENAME_ROUTINE = "rename-routine";
   String DELETE_ROUTINE = "delete-routine";
   String CREATE_ROUTINE = "create-routine";
+  String UPDATE_TASKS = "update-tasks";
+  String GET_TASKS = "get-tasks";
+  String CREATE_TASK = "create-task";
+  String UPDATE_TASK = "update-task";
+  String UPDATE_BREAK_INTERVAL = "update-break-interval";
+  String GET_BREAK_INTERVAL = "get-break-interval";
+  String SAVE_HISTORY = "save-history"; //save after each task completes
+  String GET_HISTORY = "get-history";
 
   void getRoutines();
 
@@ -21,16 +29,7 @@ public interface MyActions {
 
   void createRoutine(String name, int priority);
 
-  String GET_TASKS = "get-tasks";
-  String CREATE_TASK = "create-task";
-  String UPDATE_TASKS = "update-tasks";
-  String UPDATE_TASK = "update-task";
-
   void updateTask(String routine, Task oldTask, Task newTask, int position);
-
-  String GET_BREAK_INTERVAL = "get-break-interval";
-
-  String UPDATE_BREAK_INTERVAL = "update-break-interval";
 
   void updateBreakInterval(String routine, int interval);
 
@@ -39,7 +38,6 @@ public interface MyActions {
   void getTasks(String routine);
 
   void createTask(String routine, Task task, int priority);
-
 
   void updateTasks(String routine, List<Task> tasks);
 }

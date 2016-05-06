@@ -15,6 +15,8 @@ import java.util.List;
 
 public class ActionsCreator implements MyActions {
 
+  public static String BASE_URL = "https://routineplan.firebaseio.com/";
+
   private static ActionsCreator instance;
   final Dispatcher dispatcher;
 
@@ -29,10 +31,19 @@ public class ActionsCreator implements MyActions {
     return instance;
   }
 
+  //Routine methods
+  private String getRoutineUrl(String user, String routine) {
+    return getRoutinesUrl(user) + "/" + routine;
+  }
+
+  private String getRoutinesUrl(String user) {
+    return BASE_URL + "/" + user + "/Routines/";
+  }
+
   @Override public void getRoutines() {
     String user = Prefs.getString(App.USER, null);
 
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
+    final Firebase routinesRef = new Firebase(getRoutinesUrl(user));
     routinesRef.addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
         List<Routine> routines = new ArrayList<Routine>();
@@ -61,9 +72,40 @@ public class ActionsCreator implements MyActions {
     });
   }
 
+  @Override public void createRoutine(String name, int priority) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase routinesRef = new Firebase(getRoutinesUrl(user));
+    routinesRef.child(name).child("Break").setValue(5);
+  }
+
+  @Override public void renameRoutine(final String oldName, final String newName) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase routinesRef = new Firebase(getRoutinesUrl(user));
+    final Firebase oldTaskRef = new Firebase(getRoutinesUrl(user) + "/" + oldName);
+    oldTaskRef.addValueEventListener(new ValueEventListener() {
+      @Override public void onDataChange(DataSnapshot dataSnapshot) {
+        oldTaskRef.removeEventListener(this);
+        routinesRef.child(newName).setValue(dataSnapshot.getValue());
+        oldTaskRef.removeValue();
+        dispatcher.dispatch(MyActions.RENAME_ROUTINE, Keys.ROUTINE, newName);
+      }
+
+      @Override public void onCancelled(FirebaseError firebaseError) {
+
+      }
+    });
+  }
+
+  @Override public void deleteRoutine(String routine) {
+    String user = Prefs.getString(App.USER, null);
+    final Firebase routinesRef = new Firebase(getRoutineUrl(user, routine));
+    routinesRef.removeValue();
+  }
+
+  //Task methods
   @Override public void getTasks(String routine) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase tasksRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
+    final Firebase tasksRef = new Firebase(getRoutineUrl(user, routine) + "/Tasks");
     tasksRef.orderByPriority().addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
         try {
@@ -87,27 +129,27 @@ public class ActionsCreator implements MyActions {
 
   @Override public void createTask(String routine, Task task, int priority) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
+    final Firebase routinesRef = new Firebase(getRoutinesUrl(user));
     routinesRef.child(routine).child("Tasks").child(task.getName()).setValue(task.getMinutes());
   }
 
   @Override public void updateTasks(String routine, List<Task> tasks) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
+    final Firebase routinesRef = new Firebase(getTasksUrl(user, routine));
+
     for (int i = 0; i < tasks.size(); i++) {
       routinesRef.child(tasks.get(i).getName()).setPriority(i + 1);
     }
   }
 
-  @Override public void createRoutine(String name, int priority) {
-    String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
-    routinesRef.child(name).child("Break").setValue(5);
+  private String getTasksUrl(String user, String routine) {
+    return getRoutinesUrl(user) + "/" + routine + "/Tasks";
   }
 
   @Override public void updateTask(String routine, Task oldTask, Task newTask, int position) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Tasks");
+    final Firebase routinesRef = new Firebase(getTasksUrl(user, routine));
+
     if (oldTask.getName().equals(newTask.getName())) {
       if (oldTask.getMinutes() == newTask.getMinutes()) {
         return;
@@ -121,18 +163,23 @@ public class ActionsCreator implements MyActions {
     dispatcher.dispatch(MyActions.UPDATE_TASK, Keys.TASK, newTask);
   }
 
+  //Break methods
   @Override public void updateBreakInterval(String routine, int interval) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase breakRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Break");
+    final Firebase breakRef = new Firebase(getBreakUrl(user, routine));
     breakRef.setValue(interval);
+  }
+
+  private String getBreakUrl(String user, String routine) {
+    return getRoutinesUrl(user) + "/" + routine + "/Break";
   }
 
   @Override public void getBreakInterval(String routine) {
     String user = Prefs.getString(App.USER, null);
-    final Firebase breakRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine + "/Break");
+    final Firebase breakRef = new Firebase(getBreakUrl(user, routine));
     breakRef.addValueEventListener(new ValueEventListener() {
       @Override public void onDataChange(DataSnapshot dataSnapshot) {
-        String breakInterval = (String) String.valueOf(dataSnapshot.getValue());
+        String breakInterval = String.valueOf(dataSnapshot.getValue());
         dispatcher.dispatch(MyActions.GET_BREAK_INTERVAL, Keys.BREAK, breakInterval);
       }
 
@@ -142,27 +189,4 @@ public class ActionsCreator implements MyActions {
     });
   }
 
-  @Override public void renameRoutine(final String oldName, final String newName) {
-    String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user);
-    final Firebase oldTaskRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + oldName);
-    oldTaskRef.addValueEventListener(new ValueEventListener() {
-      @Override public void onDataChange(DataSnapshot dataSnapshot) {
-        oldTaskRef.removeEventListener(this);
-        routinesRef.child(newName).setValue(dataSnapshot.getValue());
-        oldTaskRef.removeValue();
-        dispatcher.dispatch(MyActions.RENAME_ROUTINE, Keys.ROUTINE, newName);
-      }
-
-      @Override public void onCancelled(FirebaseError firebaseError) {
-
-      }
-    });
-  }
-
-  @Override public void deleteRoutine(String routine) {
-    String user = Prefs.getString(App.USER, null);
-    final Firebase routinesRef = new Firebase("https://routineplan.firebaseio.com/" + user + "/" + routine);
-    routinesRef.removeValue();
-  }
 }

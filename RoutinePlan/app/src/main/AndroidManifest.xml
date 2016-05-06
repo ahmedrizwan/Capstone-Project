@@ -25,6 +25,7 @@
 
     <activity android:name=".activity.TasksActivity"/>
     <activity android:name=".activity.PlayActivity"/>
+
     <service android:name=".MyService"/>
   </application>
 </manifest>

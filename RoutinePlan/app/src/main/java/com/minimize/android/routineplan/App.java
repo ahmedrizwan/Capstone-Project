@@ -64,6 +64,7 @@ public class App extends Application {
     Firebase.setAndroidContext(this);
     Firebase.getDefaultConfig().setPersistenceEnabled(true);
     mFirebaseRef = new Firebase("https://routineplan.firebaseio.com/");
+
     Timber.plant(new Timber.DebugTree());
     // Initialize the Prefs class
     new Prefs.Builder().setContext(this)
