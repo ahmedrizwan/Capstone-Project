@@ -10,6 +10,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
+import com.minimize.android.routineplan.itemhelper.OnTaskCompleted;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
@@ -67,6 +68,13 @@ public class MyService extends Service {
   private OnTimeTick mOnTimeTick;
 
   private OnTaskStarted mOnTaskStarted;
+
+  private OnTaskCompleted mOnTaskCompleted;
+
+  public void setOnTaskCompleted(OnTaskCompleted onTaskCompleted) {
+    mOnTaskCompleted = onTaskCompleted;
+  }
+
 
   public void setOnTaskStarted(OnTaskStarted onTaskStarted) {
     mOnTaskStarted = onTaskStarted;
@@ -127,9 +135,16 @@ public class MyService extends Service {
 
         @Override public void onFinish() {
           Timber.e("onFinish : Finished");
+          if (mOnTaskCompleted != null) {
+            Task task = mTasks.get(currentTask);
+            mOnTaskCompleted.onTaskCompleted(routine, task);
+          }
+
           if (taskIndex + 1 < mTasks.size()) {
+
             currentTask = taskIndex + 1;
             countDownTimer(taskIndex + 1);
+
           } else {
             //means everything ended
             mOnTaskStarted.onTaskStarted(null, null);

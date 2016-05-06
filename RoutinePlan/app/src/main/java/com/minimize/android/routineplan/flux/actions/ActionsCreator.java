@@ -159,7 +159,13 @@ public class ActionsCreator implements MyActions {
 
       }
     });
+  }
 
+  @Override public void saveHistory(String routine, Task task, String date, String time) {
+    final String user = Prefs.getString(App.USER, null);
+    final Firebase historyRef = new Firebase(BASE_URL + "/" + user+"/History");
+    historyRef.child(date).child(time).child(routine).setValue(task.getName());
+    historyRef.child(date).child(time).child("Time").setValue(task.getMinutes());
   }
 
   private String getTasksUrl(String user, String routine) {

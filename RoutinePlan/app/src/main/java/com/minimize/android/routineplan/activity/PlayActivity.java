@@ -15,7 +15,11 @@ import com.minimize.android.routineplan.Task;
 import com.minimize.android.routineplan.databinding.ActivityPlayBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
+import com.minimize.android.routineplan.itemhelper.OnTaskCompleted;
 import com.squareup.otto.Subscribe;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.List;
 import org.parceler.Parcels;
 import timber.log.Timber;
@@ -38,7 +42,7 @@ public class PlayActivity extends BaseActivity {
 
     ActionBar supportActionBar = getSupportActionBar();
     if (supportActionBar != null) {
-      supportActionBar.setTitle("Playing: " + mRoutine.getName()+" Routine");
+      supportActionBar.setTitle("Playing: " + mRoutine.getName() + " Routine");
       supportActionBar.setDisplayHomeAsUpEnabled(true);
     }
     Timber.e("onCreate : Break Interval " + mRoutine.getBreakInterval());
@@ -94,7 +98,6 @@ public class PlayActivity extends BaseActivity {
           finish();
         }
       });
-
     } else {
       Timber.e("onCreate : Service not bound bruh!");
     }
@@ -136,6 +139,26 @@ public class PlayActivity extends BaseActivity {
           mBinding.textViewTimer.setText("00:00");
           finish();
         }
+      }
+    });
+
+    mService.setOnTaskCompleted(new OnTaskCompleted() {
+      @Override public void onTaskCompleted(String routine, Task task) {
+        //Save history
+        //get Date
+        Calendar calendar = Calendar.getInstance();
+        NumberFormat instance = new DecimalFormat("00");
+
+        String date = instance.format(calendar.get(Calendar.DAY_OF_MONTH)) + "-" +
+            instance.format(calendar.get(Calendar.MONTH)) + "-" +
+            instance.format(calendar.get(Calendar.YEAR));
+
+        Timber.e("onTaskCompleted : " + date);
+        String time = instance.format(calendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+            instance.format(calendar.get(Calendar.MINUTE));
+        Timber.e("onTaskCompleted : " + time);
+
+        mActionsCreator.saveHistory(routine, task, date, time);
       }
     });
 

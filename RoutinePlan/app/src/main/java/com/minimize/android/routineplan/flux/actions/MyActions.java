@@ -43,4 +43,6 @@ public interface MyActions {
   void updateTasks(String routine, List<Task> tasks);
 
   void login(String userEmail);
+
+  void saveHistory(String routine, Task task, String date, String time);
 }
