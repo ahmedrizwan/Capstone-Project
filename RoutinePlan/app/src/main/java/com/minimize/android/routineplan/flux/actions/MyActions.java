@@ -20,6 +20,7 @@ public interface MyActions {
   String GET_BREAK_INTERVAL = "get-break-interval";
   String SAVE_HISTORY = "save-history"; //save after each task completes
   String GET_HISTORY = "get-history";
+  String LOGIN = "login";
 
   void getRoutines();
 
@@ -40,4 +41,6 @@ public interface MyActions {
   void createTask(String routine, Task task, int priority);
 
   void updateTasks(String routine, List<Task> tasks);
+
+  void login(String userEmail);
 }

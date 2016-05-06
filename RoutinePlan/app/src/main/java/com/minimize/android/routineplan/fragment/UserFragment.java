@@ -3,11 +3,13 @@ package com.minimize.android.routineplan.fragment;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -15,8 +17,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.minimize.android.routineplan.App;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.databinding.FragmentUserBinding;
+import com.minimize.android.routineplan.flux.actions.Keys;
+import com.pixplicity.easyprefs.library.Prefs;
 import timber.log.Timber;
 
 /**
@@ -32,29 +39,68 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
     mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_user, container, false);
     // Configure sign-in to request the user's ID, email address, and basic
     // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestEmail()
-        .build();
+    GoogleSignInOptions gso =
+        new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
 
-    mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-        .enableAutoManage(getActivity(), this)
+    mGoogleApiClient = new GoogleApiClient.Builder(getContext()).enableAutoManage(getActivity(), this)
         .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
         .build();
 
-    final SignInButton signInButton = (SignInButton) mBinding.getRoot().findViewById(R.id.sign_in_button);
-    signInButton.setSize(SignInButton.SIZE_STANDARD);
-    signInButton.setScopes(gso.getScopeArray());
+    if (Prefs.getBoolean(Keys.LOGGED_IN, false)) {
+      //make logout button visible
+      mBinding.logout.setVisibility(View.VISIBLE);
+      mBinding.signInButton.setVisibility(View.GONE);
+      //set image
+      Glide.with(getContext()).load(Prefs.getString(Keys.PHOTO_URL, null)).into(mBinding.profileImage);
+      //set name
+      mBinding.userName.setText(Prefs.getString(Keys.NAME, null));
+      mBinding.logout.setOnClickListener(new View.OnClickListener() {
+        @Override public void onClick(View v) {
+          signOut();
+        }
+      });
+    } else {
 
-    signInButton.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        signIn();
-      }
-    });
+      //make logout button gone
+      mBinding.logout.setVisibility(View.GONE);
+      mBinding.signInButton.setVisibility(View.VISIBLE);
+
+      final SignInButton signInButton = (SignInButton) mBinding.getRoot().findViewById(R.id.sign_in_button);
+      signInButton.setSize(SignInButton.SIZE_STANDARD);
+      signInButton.setScopes(gso.getScopeArray());
+
+      signInButton.setOnClickListener(new View.OnClickListener() {
+        @Override public void onClick(View v) {
+          signIn();
+        }
+      });
+    }
+
     return mBinding.getRoot();
   }
+
   private void signIn() {
     Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
     startActivityForResult(signInIntent, RC_SIGN_IN);
+  }
+
+  private void signOut() {
+    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+      @Override public void onResult(Status status) {
+        // ...
+        Timber.e("onResult : Logout");
+        Prefs.putBoolean(Keys.LOGGED_IN, false);
+        Prefs.putString(Keys.NAME, "Awesome User");
+        Prefs.putString(Keys.PHOTO_URL, null);
+        String android_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+        Prefs.putString(App.USER, android_id);
+        mBinding.logout.setVisibility(View.GONE);
+        mBinding.signInButton.setVisibility(View.VISIBLE);
+        mBinding.profileImage.setImageResource(R.drawable.user_image);
+        mBinding.userName.setText("Awesome User");
+
+      }
+    });
   }
 
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -66,19 +112,30 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
   }
 
   private void handleSignInResult(GoogleSignInResult result) {
-    Timber.e("handleSignInResult:" + result.isSuccess());
     if (result.isSuccess()) {
       // Signed in successfully, show authenticated UI.
       GoogleSignInAccount acct = result.getSignInAccount();
-      Timber.e("handleSignInResult : "+acct.getDisplayName());
-
+      Glide.with(getContext()).load(acct.getPhotoUrl()).into(mBinding.profileImage);
+      mBinding.userName.setText(acct.getDisplayName());
+      Prefs.putBoolean(Keys.LOGGED_IN, true);
+      Prefs.putString(Keys.NAME, acct.getDisplayName());
+      Prefs.putString(Keys.PHOTO_URL, acct.getPhotoUrl().toString());
+      mActionsCreator.login(acct.getId());
+      mBinding.signInButton.setVisibility(View.GONE);
+      mBinding.logout.setVisibility(View.VISIBLE);
     } else {
       // Signed out, show unauthenticated UI.
       Timber.e("handleSignInResult : Logged Out");
+      mBinding.userName.setText("Awesome User");
     }
   }
 
   @Override public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+  }
+
+  @Override public void onPause() {
+    super.onPause();
+    if (mGoogleApiClient != null) mGoogleApiClient.stopAutoManage(getActivity());
   }
 }

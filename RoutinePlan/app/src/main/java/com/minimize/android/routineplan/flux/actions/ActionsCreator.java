@@ -142,6 +142,26 @@ public class ActionsCreator implements MyActions {
     }
   }
 
+  @Override public void login(final String userEmail) {
+    final String user = Prefs.getString(App.USER, null);
+
+    final Firebase userRef = new Firebase(BASE_URL + "/" + user);
+    final Firebase newUserRef = new Firebase(BASE_URL + "/");
+    userRef.addValueEventListener(new ValueEventListener() {
+      @Override public void onDataChange(DataSnapshot dataSnapshot) {
+        userRef.removeEventListener(this);
+        newUserRef.child(userEmail).setValue(dataSnapshot.getValue());
+        userRef.removeValue();
+        Prefs.putString(App.USER, userEmail);
+      }
+
+      @Override public void onCancelled(FirebaseError firebaseError) {
+
+      }
+    });
+
+  }
+
   private String getTasksUrl(String user, String routine) {
     return getRoutinesUrl(user) + "/" + routine + "/Tasks";
   }

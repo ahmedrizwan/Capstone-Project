@@ -63,5 +63,7 @@ dependencies {
   apt 'org.parceler:parceler:1.1.1'
   //Google Auth
   compile 'com.google.android.gms:play-services-auth:8.4.0'
+  //circular imageView
+  compile 'de.hdodenhof:circleimageview:2.0.0'
 
 }

@@ -10,4 +10,7 @@ public interface Keys {
   String BREAK = "break";
   String ROUTINE = "routine";
   String TASK = "task";
+  String LOGGED_IN = "logged_in";
+  String NAME = "name";
+  String PHOTO_URL = "photo_url";
 }
