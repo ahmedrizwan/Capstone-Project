@@ -8,11 +8,17 @@
       android:orientation="vertical"
       >
 
-    <Button
-        android:id="@+id/buttonPanel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="History"
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recyclerViewHistory"
+
+        />
+
+    <com.db.chart.view.BarChartView
+        android:id="@+id/barchart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         />
   </LinearLayout>
 </layout>

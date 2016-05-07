@@ -65,5 +65,7 @@ dependencies {
   compile 'com.google.android.gms:play-services-auth:8.4.0'
   //circular imageView
   compile 'de.hdodenhof:circleimageview:2.0.0'
+  //Chart Lib
+  compile 'com.diogobernardino:williamchart:2.2'
 
 }
