@@ -89,7 +89,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
     public ItemViewHolder(View itemView) {
       super(itemView);
-      textViewTaskName = (TextView) itemView.findViewById(R.id.text_view_task_name);
+      textViewTaskName = (TextView) itemView.findViewById(R.id.task_name);
       textViewTaskTime = (TextView) itemView.findViewById(R.id.text_view_task_time);
     }
 

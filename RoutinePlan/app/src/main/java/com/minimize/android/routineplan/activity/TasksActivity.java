@@ -11,12 +11,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.RadioGroup;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
@@ -61,7 +59,7 @@ public class TasksActivity extends BaseActivity {
     mDisplayValues = convertMinutesToStrings(mMinutes);
 
     mTasksStore = TasksStore.get(mDispatcher);
-    mRoutinesStore = RoutinesStore.get(mDispatcher);
+    mRoutinesStore = RoutinesStore.get(this, mDispatcher);
 
     ActionBar supportActionBar = getSupportActionBar();
     mRoutine = getIntent().getStringExtra("Routine");
@@ -139,55 +137,55 @@ public class TasksActivity extends BaseActivity {
     mItemTouchHelper = new ItemTouchHelper(callback);
     mItemTouchHelper.attachToRecyclerView(mBinding.recyclerViewRoutines);
 
-    mBinding.fab.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        final EditText editTextTaskName = new EditText(TasksActivity.this);
-        editTextTaskName.setLayoutParams(
-            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        editTextTaskName.setHint("Task Name");
+    //mBinding.fab.setOnClickListener(new View.OnClickListener() {
+    //  @Override public void onClick(View v) {
+    //    final EditText editTextTaskName = new EditText(TasksActivity.this);
+    //    editTextTaskName.setLayoutParams(
+    //        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    //    editTextTaskName.setHint("Task Name");
+    //
+    //    final NumberPicker numberPicker = new NumberPicker(TasksActivity.this);
+    //    LinearLayout.LayoutParams params =
+    //        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    //    params.gravity = Gravity.CENTER;
+    //    numberPicker.setLayoutParams(params);
+    //
+    //    numberPicker.setDisplayedValues(convertMinutesToStrings(mMinutes));
+    //
+    //    numberPicker.setMinValue(0);
+    //    numberPicker.setMaxValue(mMinutes.length - 1);
+    //    LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
+    //    linearLayout.setOrientation(LinearLayout.VERTICAL);
+    //    linearLayout.addView(editTextTaskName);
+    //    linearLayout.addView(numberPicker);
+    //
+    //    new MaterialDialog.Builder(TasksActivity.this).title("Create a new Task")
+    //        .customView(linearLayout, true)
+    //        .positiveText("Create")
+    //        .negativeText("Cancel")
+    //        .onPositive(new MaterialDialog.SingleButtonCallback() {
+    //          @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+    //            String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
+    //            String taskName = editTextTaskName.getText().toString();
+    //            Task task = new Task(taskName, convertStringToMinutes(time));
+    //            if (taskName.length() > 0) {
+    //              mActionsCreator.createTask(mRoutine, task, mTasks.size());
+    //            }
+    //          }
+    //        })
+    //        .show();
+    //  }
+    //});
 
-        final NumberPicker numberPicker = new NumberPicker(TasksActivity.this);
-        LinearLayout.LayoutParams params =
-            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER;
-        numberPicker.setLayoutParams(params);
-
-        numberPicker.setDisplayedValues(convertMinutesToStrings(mMinutes));
-
-        numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(mMinutes.length - 1);
-        LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.addView(editTextTaskName);
-        linearLayout.addView(numberPicker);
-
-        new MaterialDialog.Builder(TasksActivity.this).title("Create a new Task")
-            .customView(linearLayout, true)
-            .positiveText("Create")
-            .negativeText("Cancel")
-            .onPositive(new MaterialDialog.SingleButtonCallback() {
-              @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
-                String taskName = editTextTaskName.getText().toString();
-                Task task = new Task(taskName, convertStringToMinutes(time));
-                if (taskName.length() > 0) {
-                  mActionsCreator.createTask(mRoutine, task, mTasks.size());
-                }
-              }
-            })
-            .show();
-      }
-    });
-
-    mBinding.radioGroupBreak.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-      @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
-        if (checkedId == R.id.radio_five_minutes) {
-          mActionsCreator.updateBreakInterval(mRoutine, 5);
-        } else if (checkedId == R.id.radio_ten_minutes) {
-          mActionsCreator.updateBreakInterval(mRoutine, 10);
-        }
-      }
-    });
+    //mBinding.radioGroupBreak.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+    //  @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
+    //    if (checkedId == R.id.radio_five_minutes) {
+    //      mActionsCreator.updateBreakInterval(mRoutine, 5);
+    //    } else if (checkedId == R.id.radio_ten_minutes) {
+    //      mActionsCreator.updateBreakInterval(mRoutine, 10);
+    //    }
+    //  }
+    //});
     mActionsCreator.getTasks(mRoutine);
     mActionsCreator.getBreakInterval(mRoutine);
   }
@@ -260,9 +258,9 @@ public class TasksActivity extends BaseActivity {
   @Subscribe public void onBreakInterval(TasksStore.BreakIntervalEvent breakIntervalEvent) {
     Timber.e("onBreakInterval : " + breakIntervalEvent.breakInterval);
     if (breakIntervalEvent.breakInterval.equals("5")) {
-      mBinding.radioFiveMinutes.setChecked(true);
+      //mBinding.radioFiveMinutes.setChecked(true);
     } else if (breakIntervalEvent.breakInterval.equals("10")) {
-      mBinding.radioTenMinutes.setChecked(true);
+      //mBinding.radioTenMinutes.setChecked(true);
     }
   }
 

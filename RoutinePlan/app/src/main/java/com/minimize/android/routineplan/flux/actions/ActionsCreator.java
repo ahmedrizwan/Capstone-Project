@@ -1,5 +1,6 @@
 package com.minimize.android.routineplan.flux.actions;
 
+import android.content.ContentValues;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -34,16 +35,17 @@ public class ActionsCreator implements MyActions {
   }
 
   //Routine methods
-  private String getRoutineUrl(String user, String routine) {
+  public static String getRoutineUrl(String user, String routine) {
     return getRoutinesUrl(user) + "/" + routine;
   }
 
-  private String getRoutinesUrl(String user) {
+  public static String getRoutinesUrl(String user) {
     return BASE_URL + "/" + user + "/Routines/";
   }
 
   @Override public void getRoutines() {
     String user = Prefs.getString(App.USER, null);
+    final ContentValues contentValues = new ContentValues();
 
     final Firebase routinesRef = new Firebase(getRoutinesUrl(user));
     routinesRef.addValueEventListener(new ValueEventListener() {
@@ -55,15 +57,22 @@ public class ActionsCreator implements MyActions {
           HashMap values = (HashMap) snapshot.getValue();
           breakInterval = ((Long) values.get("Break")).intValue();
 
+          int totalTasks = 0;
           try {
             HashMap tasks = (HashMap) values.get("Tasks");
+            totalTasks = tasks.size();
             for (Object minutes : tasks.values()) {
               totalMinutes += ((Long) minutes).intValue();
             }
           } catch (NullPointerException e) {
             //do nothing
           }
-          routines.add(new Routine(snapshot.getKey(), totalMinutes, breakInterval));
+
+          Routine routine = new Routine(snapshot.getKey(), totalMinutes, breakInterval);
+          routine.setTotalTasks(totalTasks);
+
+          routines.add(routine);
+
         }
         dispatcher.dispatch(MyActions.GET_ROUTINES, Keys.ROUTINES, routines);
       }

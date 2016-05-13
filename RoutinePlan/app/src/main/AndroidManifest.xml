@@ -3,6 +3,11 @@
     package="com.minimize.android.routineplan">
 
   <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+  <permission android:name="com.minimize.android.routineplan.permission.C2D_MESSAGE"
+      android:protectionLevel="signature" />
+  <uses-permission android:name="com.minimize.android.routineplan.permission.C2D_MESSAGE" />
 
   <application
       android:allowBackup="true"
@@ -27,5 +32,60 @@
     <activity android:name=".activity.PlayActivity"/>
 
     <service android:name=".MyService"/>
+
+    <receiver android:name=".WidgetProvider"
+        android:label="Routines">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider"
+          android:resource="@xml/widgetinfo"/>
+    </receiver>
+
+    <service
+        android:name=".WidgetViewsService"
+        android:exported="false"
+        android:permission="android.permission.BIND_REMOTEVIEWS" >
+    </service>
+
+
+    <provider
+        android:authorities="com.minimize.android.routineplan"
+        android:name=".data.MyContentProvider"/>
+
+    <!-- [START gcm_receiver] -->
+    <receiver
+        android:name="com.google.android.gms.gcm.GcmReceiver"
+        android:exported="true"
+        android:permission="com.google.android.c2dm.permission.SEND" >
+      <intent-filter>
+        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        <category android:name="gcm.play.android.samples.com.gcmquickstart" />
+      </intent-filter>
+    </receiver>
+    <!-- [END gcm_receiver] -->
+
+    <!-- [START gcm_listener] -->
+    <service
+        android:name=".MyGcmListenerService"
+        android:exported="false" >
+      <intent-filter>
+        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+      </intent-filter>
+    </service>
+    <!-- [END gcm_listener] -->
+    <!-- [START instanceId_listener] -->
+    <service
+        android:name=".MyInstanceIDListenerService"
+        android:exported="false">
+      <intent-filter>
+        <action android:name="com.google.android.gms.iid.InstanceID"/>
+      </intent-filter>
+    </service>
+    <!-- [END instanceId_listener] -->
+    <service
+        android:name=".RegistrationIntentService"
+        android:exported="false">
+    </service>
   </application>
 </manifest>

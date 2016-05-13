@@ -12,6 +12,16 @@ public class Routine {
   int totalMinutes;
   int breakInterval;
 
+  public int getTotalTasks() {
+    return totalTasks;
+  }
+
+  public void setTotalTasks(int totalTasks) {
+    this.totalTasks = totalTasks;
+  }
+
+  int totalTasks;
+
   public void setBreakInterval(int breakInterval) {
     this.breakInterval = breakInterval;
   }

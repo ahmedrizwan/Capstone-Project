@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/widget"
+    android:background="@android:color/white"
+    >
+
+  <TextView
+      android:id="@+id/widget_heading"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:elevation="4dp"
+      android:fontFamily="sans-serif-light"
+      android:gravity="center"
+      android:padding="8dp"
+      android:text="Routines"
+      android:background="@android:color/white"
+      android:textColor="@android:color/black"
+      android:textSize="16sp"
+      />
+
+  <FrameLayout
+
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@android:color/darker_gray"
+      >
+
+    <ListView
+        android:id="@+id/routines_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <TextView
+        android:id="@+id/emptyView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No Routines Found"
+        android:textColor="@android:color/black"
+        />
+
+  </FrameLayout>
+</LinearLayout>

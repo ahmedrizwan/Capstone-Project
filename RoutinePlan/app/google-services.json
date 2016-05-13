@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "136309245645",
+    "project_id": "routineplan"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136309245645:android:0317026171189276",
+        "android_client_info": {
+          "package_name": "com.minimize.android.routineplan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136309245645-34ck5i5gb082nokp9jber6vutecahg2h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.minimize.android.routineplan",
+            "certificate_hash": "0FA82512D0D934F9A0B00EFB1C6545710E6FA3F2"
+          }
+        },
+        {
+          "client_id": "136309245645-766gnfednvmbb56ubgb5ob6smdn53m67.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBELd2LgAA7zZvor7zY7JhYePF0mYorxGg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
