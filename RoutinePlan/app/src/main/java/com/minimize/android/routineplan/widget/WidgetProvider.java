@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.widget.RemoteViews;
+import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.activity.SplashActivity;
 
 public class WidgetProvider extends AppWidgetProvider {

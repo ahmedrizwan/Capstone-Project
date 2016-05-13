@@ -1,6 +1,6 @@
 package com.minimize.android.routineplan.itemhelper;
 
-import com.minimize.android.routineplan.Task;
+import com.minimize.android.routineplan.models.Task;
 import java.util.List;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.gcm;
 
 public class QuickstartPreferences {
 

@@ -1,6 +1,6 @@
 package com.minimize.android.routineplan.flux.stores;
 
-import com.minimize.android.routineplan.TimeAndInfo;
+import com.minimize.android.routineplan.models.TimeAndInfo;
 import com.minimize.android.routineplan.Utility;
 import com.minimize.android.routineplan.flux.actions.Action;
 import com.minimize.android.routineplan.flux.actions.Keys;

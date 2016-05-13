@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.itemhelper;
 
 import android.os.CountDownTimer;
 

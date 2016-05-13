@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.widget;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.data.DbContract;
 

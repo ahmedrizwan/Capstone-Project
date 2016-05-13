@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.Task;
+import com.minimize.android.routineplan.models.Task;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import java.util.ArrayList;
 import java.util.Collections;

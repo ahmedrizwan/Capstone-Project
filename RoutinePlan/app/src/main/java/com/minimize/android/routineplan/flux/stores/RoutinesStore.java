@@ -2,7 +2,7 @@ package com.minimize.android.routineplan.flux.stores;
 
 import android.content.ContentValues;
 import android.content.Context;
-import com.minimize.android.routineplan.Routine;
+import com.minimize.android.routineplan.models.Routine;
 import com.minimize.android.routineplan.Utility;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.data.DbContract;

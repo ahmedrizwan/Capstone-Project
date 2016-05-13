@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.itemhelper;
 
 /**
  * Created by ahmedrizwan on 03/05/2016.

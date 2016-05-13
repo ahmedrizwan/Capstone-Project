@@ -18,7 +18,7 @@ import android.widget.NumberPicker;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.Task;
+import com.minimize.android.routineplan.models.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.routineplan.flux.stores.TasksStore;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.gcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,6 +27,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.activity.ContainerActivity;
 
 public class MyGcmListenerService extends GcmListenerService {

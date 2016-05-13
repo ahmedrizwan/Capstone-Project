@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.widget;
 
 import android.annotation.TargetApi;
 import android.content.Intent;

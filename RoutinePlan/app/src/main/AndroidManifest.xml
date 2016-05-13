@@ -33,7 +33,7 @@
 
     <service android:name=".MyService"/>
 
-    <receiver android:name=".WidgetProvider"
+    <receiver android:name=".widget.WidgetProvider"
         android:label="Routines">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -43,7 +43,7 @@
     </receiver>
 
     <service
-        android:name=".WidgetViewsService"
+        android:name=".widget.WidgetViewsService"
         android:exported="false"
         android:permission="android.permission.BIND_REMOTEVIEWS" >
     </service>
@@ -67,7 +67,7 @@
 
     <!-- [START gcm_listener] -->
     <service
-        android:name=".MyGcmListenerService"
+        android:name=".gcm.MyGcmListenerService"
         android:exported="false" >
       <intent-filter>
         <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -76,7 +76,7 @@
     <!-- [END gcm_listener] -->
     <!-- [START instanceId_listener] -->
     <service
-        android:name=".MyInstanceIDListenerService"
+        android:name=".gcm.MyInstanceIDListenerService"
         android:exported="false">
       <intent-filter>
         <action android:name="com.google.android.gms.iid.InstanceID"/>
@@ -84,7 +84,7 @@
     </service>
     <!-- [END instanceId_listener] -->
     <service
-        android:name=".RegistrationIntentService"
+        android:name=".gcm.RegistrationIntentService"
         android:exported="false">
     </service>
   </application>

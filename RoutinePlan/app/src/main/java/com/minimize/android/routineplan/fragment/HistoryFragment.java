@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.TimeAndInfo;
+import com.minimize.android.routineplan.models.TimeAndInfo;
 import com.minimize.android.routineplan.databinding.FragmentHistoryBinding;
 import com.minimize.android.routineplan.databinding.ItemHistoryHeadingBinding;
 import com.minimize.android.routineplan.databinding.ItemHistoryItemBinding;

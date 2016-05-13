@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -25,6 +25,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.minimize.android.routineplan.R;
 import java.io.IOException;
 import timber.log.Timber;
 

@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.models;
 
 /**
  * Created by ahmedrizwan on 26/04/2016.

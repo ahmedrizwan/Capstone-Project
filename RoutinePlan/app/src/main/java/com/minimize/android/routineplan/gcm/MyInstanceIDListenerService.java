@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.gcm;
 
 import android.content.Intent;
 import com.google.android.gms.iid.InstanceIDListenerService;
+import com.minimize.android.routineplan.gcm.RegistrationIntentService;
 
 public class MyInstanceIDListenerService extends InstanceIDListenerService {
 

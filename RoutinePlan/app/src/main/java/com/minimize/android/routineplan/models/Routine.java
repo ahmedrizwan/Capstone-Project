@@ -1,4 +1,4 @@
-package com.minimize.android.routineplan;
+package com.minimize.android.routineplan.models;
 
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
