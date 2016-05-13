@@ -4,17 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-  <LinearLayout
+  <RelativeLayout
       android:id="@+id/layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:orientation="vertical"
       >
 
+
+
+    <TextView
+        android:id="@+id/text_view_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="46sp"
+        android:fontFamily="sans-serif-light"
+        android:text="00:00:00"
+        />
     <TextView
         android:id="@+id/text_view_playing_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@id/text_view_timer"
+        android:layout_centerHorizontal="true"
+        android:padding="@dimen/default_margin"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-light"
         tools:text="Currently Playing Task"
         />
 
@@ -22,36 +38,65 @@
         android:id="@+id/text_view_time_remaining"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/text_view_timer"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-light"
         android:text="Time Remaining"
         />
-
-    <TextView
-        android:id="@+id/text_view_timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00:00"
-        />
-
     <TextView
         android:id="@+id/text_view_next_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/text_view_time_remaining"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-light"
         android:text="Next task: "
         />
 
-    <Button
-        android:id="@+id/button_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancel"
-        />
+    <!--<Button-->
+        <!--android:id="@+id/button_cancel"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:text="Cancel"-->
+        <!--/>-->
 
-    <Button
-        android:id="@+id/button_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pause"
-        />
-  </LinearLayout>
+    <!--<Button-->
+        <!--android:id="@+id/button_pause"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!---->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Pause"-->
+        <!--/>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+      <ImageView
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:src="@drawable/ic_pause"
+          android:padding="10dp"
+          android:foreground="?attr/selectableItemBackground"
+          android:background="@color/colorPrimaryDark"
+          android:id="@+id/pause"
+          />
+
+      <ImageView
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:foreground="?attr/selectableItemBackground"
+          android:background="@color/danger"
+          android:id="@+id/cancel"
+          android:src="@drawable/ic_cancel"
+          android:padding="10dp"
+          />
+    </LinearLayout>
+  </RelativeLayout>
 </layout>
 

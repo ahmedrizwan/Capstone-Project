@@ -34,17 +34,14 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
   FragmentUserBinding mBinding;
   private GoogleApiClient mGoogleApiClient;
 
-  @Nullable @Override public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
-      @Nullable final Bundle savedInstanceState) {
+  @Nullable @Override
+  public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
     mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_user, container, false);
     // Configure sign-in to request the user's ID, email address, and basic
     // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-    GoogleSignInOptions gso =
-        new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
 
-    mGoogleApiClient = new GoogleApiClient.Builder(getContext()).enableAutoManage(getActivity(), this)
-        .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-        .build();
+    mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
     if (Prefs.getBoolean(Keys.LOGGED_IN, false)) {
       //make logout button visible
@@ -98,7 +95,6 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
         mBinding.signInButton.setVisibility(View.VISIBLE);
         mBinding.profileImage.setImageResource(R.drawable.user_image);
         mBinding.userName.setText("Awesome User");
-
       }
     });
   }
@@ -134,8 +130,16 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
 
   }
 
-  @Override public void onPause() {
-    super.onPause();
-    if (mGoogleApiClient != null) mGoogleApiClient.stopAutoManage(getActivity());
+  @Override public void onStart() {
+    super.onStart();
+    if (mGoogleApiClient != null)
+      mGoogleApiClient.connect();
+  }
+
+  @Override public void onStop() {
+    if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+      mGoogleApiClient.disconnect();
+    }
+    super.onStop();
   }
 }

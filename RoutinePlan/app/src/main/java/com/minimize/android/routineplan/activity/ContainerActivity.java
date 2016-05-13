@@ -12,13 +12,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.minimize.android.routineplan.gcm.QuickstartPreferences;
+import com.minimize.android.routineplan.FragNavController;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.gcm.RegistrationIntentService;
 import com.minimize.android.routineplan.fragment.HistoryFragment;
 import com.minimize.android.routineplan.fragment.RoutinesFragment;
 import com.minimize.android.routineplan.fragment.UserFragment;
-import com.ncapdevi.fragnav.FragNavController;
+import com.minimize.android.routineplan.gcm.QuickstartPreferences;
+import com.minimize.android.routineplan.gcm.RegistrationIntentService;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabClickListener;
@@ -40,16 +40,16 @@ public class ContainerActivity extends BaseActivity {
     fragments.add(new HistoryFragment());
     fragments.add(new UserFragment());
 
-    mNavController =
-        new FragNavController(getSupportFragmentManager(), R.id.fragment_container, fragments);
+    mNavController = new FragNavController(getSupportFragmentManager(), R.id.fragment_container, fragments);
 
     mBottomBar = BottomBar.attach(this, savedInstanceState);
-    mBottomBar.setItems(new BottomBarTab(R.drawable.routines, "Routines"),
-        new BottomBarTab(R.drawable.history, "History"), new BottomBarTab(R.drawable.user, "User"));
+
+    mBottomBar.setItems(new BottomBarTab(R.drawable.routines, "Routines"), new BottomBarTab(R.drawable.history, "History"),
+        new BottomBarTab(R.drawable.user, "User"));
+
     // Listen for tab changes
     mBottomBar.setOnTabClickListener(new OnTabClickListener() {
-      @Override
-      public void onTabSelected(int position) {
+      @Override public void onTabSelected(int position) {
         // The user selected a tab at the specified position
         switch (position) {
           case 0:
@@ -62,23 +62,18 @@ public class ContainerActivity extends BaseActivity {
             mNavController.switchTab(FragNavController.TAB3);
             break;
         }
-
       }
 
-      @Override
-      public void onTabReSelected(int position) {
+      @Override public void onTabReSelected(int position) {
         // The user reselected a tab at the specified position!
         mNavController.clearStack();
       }
     });
 
     mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-        SharedPreferences sharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(context);
-        boolean sentToken = sharedPreferences
-            .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+      @Override public void onReceive(Context context, Intent intent) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean sentToken = sharedPreferences.getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
         if (sentToken) {
 
         } else {
@@ -94,14 +89,15 @@ public class ContainerActivity extends BaseActivity {
       startService(intent);
     }
   }
+
   private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
   private boolean checkPlayServices() {
     GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
     int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
     if (resultCode != ConnectionResult.SUCCESS) {
       if (apiAvailability.isUserResolvableError(resultCode)) {
-        apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-            .show();
+        apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
       } else {
         Log.i("GCM", "This device is not supported.");
         finish();
@@ -110,17 +106,25 @@ public class ContainerActivity extends BaseActivity {
     }
     return true;
   }
+
   private BroadcastReceiver mRegistrationBroadcastReceiver;
-  @Override
-  protected void onResume() {
+
+  @Override protected void onResume() {
     super.onResume();
-    LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-        new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+    LocalBroadcastManager.getInstance(this)
+        .registerReceiver(mRegistrationBroadcastReceiver, new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+  }
+
+  @Override protected void onPause() {
+    LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    super.onPause();
   }
 
   @Override
-  protected void onPause() {
-    LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-    super.onPause();
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    // Necessary to restore the BottomBar's state, otherwise we would
+    // lose the current tab on orientation change.
+    mBottomBar.onSaveInstanceState(outState);
   }
 }

@@ -2,20 +2,21 @@ package com.minimize.android.routineplan.activity;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
 import com.minimize.android.routineplan.App;
 import com.minimize.android.routineplan.MyService;
-import com.minimize.android.routineplan.itemhelper.OnTaskStarted;
-import com.minimize.android.routineplan.itemhelper.OnTimeTick;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.models.Routine;
-import com.minimize.android.routineplan.models.Task;
 import com.minimize.android.routineplan.databinding.ActivityPlayBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
 import com.minimize.android.routineplan.itemhelper.OnTaskCompleted;
+import com.minimize.android.routineplan.itemhelper.OnTaskStarted;
+import com.minimize.android.routineplan.itemhelper.OnTimeTick;
+import com.minimize.android.routineplan.models.Routine;
+import com.minimize.android.routineplan.models.Task;
 import com.squareup.otto.Subscribe;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -33,6 +34,10 @@ public class PlayActivity extends BaseActivity {
   Routine mRoutine;
   TasksStore mTasksStore;
   private MyService mService;
+
+  int hours;
+  int minutes;
+  int seconds;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -53,8 +58,12 @@ public class PlayActivity extends BaseActivity {
       if (mService.getRoutineName().equals(mRoutine.getName())) {
         Timber.e("onCreate : Routine already running");
         mService.setOnTimeTick(new OnTimeTick() {
-          @Override public void onTimeTick(long seconds) {
-            mBinding.textViewTimer.setText(seconds + "");
+          @Override public void onTimeTick(long totalSeconds) {
+            hours = (int) (totalSeconds / 3600);
+            minutes = (int) ((totalSeconds % 3600) / 60);
+            seconds = (int) (totalSeconds % 60);
+
+            mBinding.textViewTimer.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
           }
         });
 
@@ -78,24 +87,35 @@ public class PlayActivity extends BaseActivity {
       } else {
         mActionsCreator.getTasks(mRoutine.getName());
       }
-      mBinding.buttonPause.setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) {
-          if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
-            mService.pauseRoutine();
-            mBinding.buttonPause.setText("Resume");
-          } else {
-            mService.resumeRoutine();
-            mBinding.buttonPause.setText("Pause");
-          }
-        }
-      });
-
+      //mBinding.buttonPause.setOnClickListener(new View.OnClickListener() {
+      //  @Override public void onClick(View v) {
+      //    if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
+      //      mService.pauseRoutine();
+      //      mBinding.buttonPause.setText("Resume");
+      //    } else {
+      //      mService.resumeRoutine();
+      //      mBinding.buttonPause.setText("Pause");
+      //    }
+      //  }
+      //});
+      //
       setPauseButtonState();
-
-      mBinding.buttonCancel.setOnClickListener(new View.OnClickListener() {
+      //
+      mBinding.cancel.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {
           mService.stopRoutine();
           finish();
+        }
+      });
+      mBinding.pause.setOnClickListener(new View.OnClickListener() {
+        @Override public void onClick(View v) {
+          if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
+            mService.pauseRoutine();
+            mBinding.pause.setImageDrawable(ContextCompat.getDrawable(PlayActivity.this, R.drawable.ic_play));
+          } else {
+            mService.resumeRoutine();
+            mBinding.pause.setImageDrawable(ContextCompat.getDrawable(PlayActivity.this, R.drawable.ic_pause));
+          }
         }
       });
     } else {
@@ -121,8 +141,12 @@ public class PlayActivity extends BaseActivity {
     mService.setRoutine(mRoutine.getName());
     mService.setTasks(tasks);
     mService.setOnTimeTick(new OnTimeTick() {
-      @Override public void onTimeTick(long seconds) {
-        mBinding.textViewTimer.setText(seconds + "");
+      @Override public void onTimeTick(long totalSeconds) {
+        hours = (int) (totalSeconds / 3600);
+        minutes = (int) ((totalSeconds % 3600) / 60);
+        seconds = (int) (totalSeconds % 60);
+
+        mBinding.textViewTimer.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
       }
     });
 
@@ -169,10 +193,9 @@ public class PlayActivity extends BaseActivity {
 
   private void setPauseButtonState() {
     if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
-
-      mBinding.buttonPause.setText("Pause");
+      mBinding.pause.setImageDrawable(ContextCompat.getDrawable(PlayActivity.this, R.drawable.ic_pause));
     } else {
-      mBinding.buttonPause.setText("Resume");
+      mBinding.pause.setImageDrawable(ContextCompat.getDrawable(PlayActivity.this, R.drawable.ic_play));
     }
   }
 

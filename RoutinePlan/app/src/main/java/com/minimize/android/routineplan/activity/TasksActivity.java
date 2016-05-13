@@ -1,5 +1,6 @@
 package com.minimize.android.routineplan.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,14 +20,16 @@ import android.widget.NumberPicker;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.models.Task;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
+import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
 import com.minimize.android.routineplan.itemhelper.OnItemClick;
 import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
 import com.minimize.android.routineplan.itemhelper.RecyclerListAdapter;
 import com.minimize.android.routineplan.itemhelper.SimpleItemTouchHelperCallback;
+import com.minimize.android.routineplan.models.Routine;
+import com.minimize.android.routineplan.models.Task;
 import com.squareup.otto.Subscribe;
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -33,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.parceler.Parcels;
 import timber.log.Timber;
 
 /**
@@ -48,7 +53,8 @@ public class TasksActivity extends BaseActivity {
   private List<Task> mTasks;
 
   private Timer mTimer;
-  private String mRoutine;
+  private Routine mRoutine;
+
   int[] mMinutes = { 30, 60, 90, 120, 150, 180 };
   String[] mDisplayValues = new String[mMinutes.length];
 
@@ -62,25 +68,23 @@ public class TasksActivity extends BaseActivity {
     mRoutinesStore = RoutinesStore.get(this, mDispatcher);
 
     ActionBar supportActionBar = getSupportActionBar();
-    mRoutine = getIntent().getStringExtra("Routine");
+    mRoutine = Parcels.unwrap(getIntent().getParcelableExtra(Keys.ROUTINE));
 
     if (supportActionBar != null) {
       supportActionBar.setDisplayHomeAsUpEnabled(true);
-      supportActionBar.setTitle(mRoutine + " Tasks");
+      supportActionBar.setTitle(mRoutine.getName() + " Tasks");
     }
 
     mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new OnItemClick<Task>() {
       @Override public void onItemClick(final Task oldTask, final int position) {
         //Launch material dialog
         final EditText editTextTaskName = new EditText(TasksActivity.this);
-        editTextTaskName.setLayoutParams(
-            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editTextTaskName.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         editTextTaskName.setHint("Task Name");
         editTextTaskName.setText(oldTask.getName());
 
         final NumberPicker numberPicker = new NumberPicker(TasksActivity.this);
-        LinearLayout.LayoutParams params =
-            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         numberPicker.setLayoutParams(params);
 
@@ -106,7 +110,7 @@ public class TasksActivity extends BaseActivity {
                 Task task = new Task(taskName, convertStringToMinutes(time));
                 if (taskName.length() > 0) {
                   //mActionsCreator.upd(mRoutine, task, mTasks.size());
-                  mActionsCreator.updateTask(mRoutine, oldTask, task, position);
+                  mActionsCreator.updateTask(mRoutine.getName(), oldTask, task, position);
                 }
               }
             })
@@ -123,7 +127,7 @@ public class TasksActivity extends BaseActivity {
           @Override public void run() {
             runOnUiThread(new Runnable() {
               @Override public void run() {
-                mActionsCreator.updateTasks(mRoutine, tasks);
+                mActionsCreator.updateTasks(mRoutine.getName(), tasks);
               }
             });
           }
@@ -177,6 +181,15 @@ public class TasksActivity extends BaseActivity {
     //  }
     //});
 
+    mBinding.play.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        //Start Play Activity passing in Routine item
+        Intent intent = new Intent(TasksActivity.this, PlayActivity.class);
+        intent.putExtra(Keys.ROUTINE, Parcels.wrap(mRoutine));
+        startActivity(intent);
+      }
+    });
+
     //mBinding.radioGroupBreak.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
     //  @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
     //    if (checkedId == R.id.radio_five_minutes) {
@@ -186,8 +199,14 @@ public class TasksActivity extends BaseActivity {
     //    }
     //  }
     //});
-    mActionsCreator.getTasks(mRoutine);
-    mActionsCreator.getBreakInterval(mRoutine);
+    mActionsCreator.getTasks(mRoutine.getName());
+    mActionsCreator.getBreakInterval(mRoutine.getName());
+  }
+
+  private void startRoutine(Routine item) {
+    Intent intent = new Intent(this, PlayActivity.class);
+    intent.putExtra(Keys.ROUTINE, Parcels.wrap(item));
+    startActivity(intent);
   }
 
   public static String convertMinutesToString(int minutes) {
@@ -269,11 +288,11 @@ public class TasksActivity extends BaseActivity {
   }
 
   @Subscribe public void onTaskUpdate(TasksStore.TaskUpdateEvent taskUpdateEvent) {
-    mActionsCreator.getTasks(mRoutine);
+    mActionsCreator.getTasks(mRoutine.getName());
   }
 
   @Subscribe public void onRoutineRename(RoutinesStore.RoutineRenameEvent routineRenameEvent) {
-    mRoutine = routineRenameEvent.mNewName;
+    mRoutine.setName(routineRenameEvent.mNewName);
     ActionBar supportActionBar = getSupportActionBar();
     if (supportActionBar != null) {
       supportActionBar.setTitle(routineRenameEvent.mNewName + " Tasks");
@@ -292,13 +311,50 @@ public class TasksActivity extends BaseActivity {
         //show material dialog
         new MaterialDialog.Builder(this).title("Rename Routine")
             .inputType(InputType.TYPE_CLASS_TEXT)
-            .input("Routine Name", mRoutine, false, new MaterialDialog.InputCallback() {
+            .input("Routine Name", mRoutine.getName(), false, new MaterialDialog.InputCallback() {
               @Override public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                mActionsCreator.renameRoutine(mRoutine, input.toString().trim());
+                mActionsCreator.renameRoutine(mRoutine.getName(), input.toString().trim());
               }
             })
             .show();
 
+        break;
+      case R.id.add:
+        final EditText editTextTaskName = new EditText(TasksActivity.this);
+            editTextTaskName.setLayoutParams(
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            editTextTaskName.setHint("Task Name");
+
+            final NumberPicker numberPicker = new NumberPicker(TasksActivity.this);
+            LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER;
+            numberPicker.setLayoutParams(params);
+
+            numberPicker.setDisplayedValues(convertMinutesToStrings(mMinutes));
+
+            numberPicker.setMinValue(0);
+            numberPicker.setMaxValue(mMinutes.length - 1);
+            LinearLayout linearLayout = new LinearLayout(TasksActivity.this);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.addView(editTextTaskName);
+            linearLayout.addView(numberPicker);
+
+            new MaterialDialog.Builder(TasksActivity.this).title("Create a new Task")
+                .customView(linearLayout, true)
+                .positiveText("Create")
+                .negativeText("Cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                  @Override public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    String time = numberPicker.getDisplayedValues()[numberPicker.getValue()];
+                    String taskName = editTextTaskName.getText().toString();
+                    Task task = new Task(taskName, convertStringToMinutes(time));
+                    if (taskName.length() > 0) {
+                      mActionsCreator.createTask(mRoutine.getName(), task, mTasks.size());
+                    }
+                  }
+                })
+                .show();
         break;
     }
     return super.onOptionsItemSelected(item);

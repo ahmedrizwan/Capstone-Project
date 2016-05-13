@@ -17,15 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.models.Routine;
-import com.minimize.android.routineplan.widget.WidgetProvider;
-import com.minimize.android.routineplan.activity.PlayActivity;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.data.DbContract;
 import com.minimize.android.routineplan.databinding.FragmentRoutinesBinding;
 import com.minimize.android.routineplan.databinding.ItemRoutineBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.RoutinesStore;
+import com.minimize.android.routineplan.models.Routine;
+import com.minimize.android.routineplan.widget.WidgetProvider;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
 import com.squareup.otto.Subscribe;
@@ -71,8 +70,6 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
               viewDataBinding.textViewTotalTasks.setText(totalTasks == 1 ? +totalTasks + " Task" : totalTasks + " Tasks");
             }
 
-
-
             viewDataBinding.delete.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
                 //TODO: Delete Routine
@@ -98,9 +95,8 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
             viewDataBinding.routineItem.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
-                Timber.e("onClick : ");
                 Intent intent = new Intent(getContext(), TasksActivity.class);
-                intent.putExtra("Routine", item.getName());
+                intent.putExtra(Keys.ROUTINE, Parcels.wrap(item));
                 startActivity(intent);
               }
             });
@@ -127,14 +123,14 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
     return mBinding.getRoot();
   }
 
-  private void startRoutine(Routine item) {
-    Intent intent = new Intent(getContext(), PlayActivity.class);
-    intent.putExtra(Keys.ROUTINE, Parcels.wrap(item));
-    startActivity(intent);
+  @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+
   }
 
   @Override public void onResume() {
     super.onResume();
+    Timber.e("onResume : Called");
     getContext().getContentResolver().delete(DbContract.Routine.CONTENT_URI, null, null);
     mDispatcher.register(this);
     mDispatcher.register(mRoutinesStore);
@@ -143,6 +139,7 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
   @Override public void onPause() {
     super.onPause();
+    Timber.e("onPause : Called");
     mDispatcher.unregister(this);
     mDispatcher.unregister(mRoutinesStore);
   }
