@@ -8,20 +8,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.models.TimeAndInfo;
 import com.minimize.android.routineplan.databinding.FragmentHistoryBinding;
 import com.minimize.android.routineplan.databinding.ItemHistoryHeadingBinding;
 import com.minimize.android.routineplan.databinding.ItemHistoryItemBinding;
 import com.minimize.android.routineplan.flux.stores.HistoryStore;
+import com.minimize.android.routineplan.models.TimeAndInfo;
 import com.minimize.android.rxrecycleradapter.OnGetItemViewType;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.TypesViewHolder;
 import com.minimize.android.rxrecycleradapter.ViewHolderInfo;
 import com.squareup.otto.Subscribe;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import rx.functions.Action1;
 
@@ -108,8 +112,19 @@ public class HistoryFragment extends BaseFragment {
       @Override public void call(TypesViewHolder<Item> itemTypesViewHolder) {
         Item item = itemTypesViewHolder.getItem();
         if (item instanceof Heading) {
-          ((ItemHistoryHeadingBinding) itemTypesViewHolder.getViewDataBinding()).heading.setText(((Heading) item).date);
-        } else {
+          String date = ((Heading) item).date;
+          try {
+            Date dateInstance = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+            String dayOfWeek = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(dateInstance);
+            String month = new SimpleDateFormat("MMMM",Locale.ENGLISH).format(dateInstance);
+            ((ItemHistoryHeadingBinding) itemTypesViewHolder.getViewDataBinding()).heading.setText(date.split("-")[0]+" " + month+", "+dayOfWeek);
+
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+
+          // Then get the day of week from the Date based on specific locale.
+          } else {
           Info info = ((Info) item);
           ItemHistoryItemBinding viewDataBinding = (ItemHistoryItemBinding) itemTypesViewHolder.getViewDataBinding();
           viewDataBinding.routineTask.setText(info.routine + " - " + info.task);
@@ -117,6 +132,15 @@ public class HistoryFragment extends BaseFragment {
         }
       }
     });
+
+    if (myItems.size() == 0) {
+      //show empty view
+      mBinding.recyclerViewHistory.setVisibility(View.GONE);
+      mBinding.emptyView.setVisibility(View.VISIBLE);
+    } else {
+      mBinding.recyclerViewHistory.setVisibility(View.VISIBLE);
+      mBinding.emptyView.setVisibility(View.GONE);
+    }
 
     mRxDataSource.updateDataSet(myItems).updateAdapter();
   }

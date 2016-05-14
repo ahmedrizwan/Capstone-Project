@@ -14,7 +14,10 @@ public interface MyActions {
   String CREATE_ROUTINE = "create-routine";
   String UPDATE_TASKS = "update-tasks";
   String GET_TASKS = "get-tasks";
+
   String CREATE_TASK = "create-task";
+  String DELETE_TASK = "delete-task";
+  void deleteTask(String routine, Task task);
   String UPDATE_TASK = "update-task";
   String UPDATE_BREAK_INTERVAL = "update-break-interval";
   String GET_BREAK_INTERVAL = "get-break-interval";

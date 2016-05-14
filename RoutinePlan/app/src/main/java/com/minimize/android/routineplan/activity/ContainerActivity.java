@@ -32,6 +32,8 @@ public class ContainerActivity extends BaseActivity {
   private FragNavController mNavController;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
+
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_container);
     List<Fragment> fragments = new ArrayList<>(5);
@@ -120,8 +122,7 @@ public class ContainerActivity extends BaseActivity {
     super.onPause();
   }
 
-  @Override
-  protected void onSaveInstanceState(Bundle outState) {
+  @Override protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     // Necessary to restore the BottomBar's state, otherwise we would
     // lose the current tab on orientation change.

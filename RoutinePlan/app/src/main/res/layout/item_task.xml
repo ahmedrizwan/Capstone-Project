@@ -23,7 +23,7 @@
           android:layout_width="70dp"
           android:layout_height="match_parent"
           android:layout_gravity="end"
-          android:background="@color/colorPrimaryDark"
+          android:background="?attr/colorPrimaryDark"
           android:padding="@dimen/default_margin"
           android:src="@drawable/ic_edit"
           android:id="@+id/rename"

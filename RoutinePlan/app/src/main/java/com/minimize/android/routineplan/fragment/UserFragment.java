@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -72,8 +73,67 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
         }
       });
     }
+    mBinding.about.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        new MaterialDialog.Builder(getContext())
+            .title(R.string.app_name)
+            .content("Capstone Project - Udacity Nanodegree\nBy: Ahmed Rizwan")
+            .positiveText("Close")
+            .show();
+      }
+    });
+
+    mBinding.preferences.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        final MaterialDialog dialog = new MaterialDialog.Builder(getContext()).title("Change Theme")
+            .customView(R.layout.layout_color_picker, false)
+            .positiveText("Close")
+            .show();
+        View view = dialog.getCustomView();
+        View green = view.findViewById(R.id.green);
+        View blue = view.findViewById(R.id.blue);
+        View orange = view.findViewById(R.id.orange);
+        View red = view.findViewById(R.id.red);
+
+        green.setOnClickListener(new View.OnClickListener() {
+          @Override public void onClick(View v) {
+            //set theme to green
+            setTheme(R.style.AppTheme_GreenTheme);
+            getActivity().recreate();
+            dialog.dismiss();
+          }
+        });
+        blue.setOnClickListener(new View.OnClickListener() {
+          @Override public void onClick(View v) {
+            //set theme to blue
+            setTheme(R.style.AppTheme_BlueTheme);
+            getActivity().recreate();
+            dialog.dismiss();
+          }
+        });
+        orange.setOnClickListener(new View.OnClickListener() {
+          @Override public void onClick(View v) {
+            setTheme(R.style.AppTheme_OrangeTheme);
+            getActivity().recreate();
+            dialog.dismiss();
+          }
+        });
+        red.setOnClickListener(new View.OnClickListener() {
+          @Override public void onClick(View v) {
+            setTheme(R.style.AppTheme);
+            getActivity().recreate();
+            dialog.dismiss();
+          }
+        });
+      }
+    });
+
 
     return mBinding.getRoot();
+  }
+
+  public static void setTheme(int theme) {
+    Prefs.putInt(Keys.THEME, theme);
   }
 
   private void signIn() {

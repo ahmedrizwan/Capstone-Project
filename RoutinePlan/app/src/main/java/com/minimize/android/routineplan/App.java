@@ -73,8 +73,10 @@ public class App extends Application {
         .setUseDefaultSharedPreference(true)
         .build();
 
-    String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-    Prefs.putString(App.USER, android_id);
+    if (Prefs.getString(App.USER, "").equals("")) {
+      String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+      Prefs.putString(App.USER, android_id);
+    }
 
     //Init RxFlux
     dispatcher = Dispatcher.get(new Bus());

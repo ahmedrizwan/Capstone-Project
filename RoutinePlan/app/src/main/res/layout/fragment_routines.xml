@@ -21,11 +21,15 @@
           />
 
       <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:text="@string/display_no_routines"
-          />
+          android:id="@+id/empty_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:visibility="gone"
+          android:fontFamily="sans-serif-light"
+          android:textColor="@android:color/black"
+          android:text="@string/display_no_routines" />
+
 
     </LinearLayout>
 

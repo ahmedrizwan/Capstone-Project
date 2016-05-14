@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.models.Task;
@@ -24,11 +25,13 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
   private final List<Task> mItems = new ArrayList<>();
   private final OnItemClick<Task> mOnItemClick;
   private final OnItemsReordered mOnItemsReordered;
+  private final OnItemDelete mOnItemDelete;
 
-  public RecyclerListAdapter(List<Task> items, OnItemClick<Task> itemClick, OnItemsReordered onItemsReordered) {
+  public RecyclerListAdapter(List<Task> items, OnItemClick<Task> itemClick, OnItemsReordered onItemsReordered, OnItemRename onItemRename, OnItemDelete onItemDelete) {
     mOnItemClick = itemClick;
     mOnItemsReordered = onItemsReordered;
     mItems.addAll(items);
+    mOnItemDelete = onItemDelete;
   }
 
   @Override public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -41,6 +44,13 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     final Task task = mItems.get(position);
     holder.textViewTaskName.setText(task.getName());
     holder.textViewTaskTime.setText(TasksActivity.convertMinutesToString(task.getMinutes()));
+
+    holder.imageViewDelete.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        mOnItemDelete.onItemDelete(task);
+      }
+    });
+
 
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
@@ -86,11 +96,15 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
     public final TextView textViewTaskName;
     public final TextView textViewTaskTime;
+    public final ImageView imageViewRename;
+    public final ImageView imageViewDelete;
 
     public ItemViewHolder(View itemView) {
       super(itemView);
       textViewTaskName = (TextView) itemView.findViewById(R.id.task_name);
       textViewTaskTime = (TextView) itemView.findViewById(R.id.text_view_task_time);
+      imageViewDelete = (ImageView) itemView.findViewById(R.id.delete);
+      imageViewRename = (ImageView) itemView.findViewById(R.id.rename);
     }
 
     @Override public void onItemSelected() {

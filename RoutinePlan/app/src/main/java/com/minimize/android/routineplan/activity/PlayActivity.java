@@ -17,6 +17,7 @@ import com.minimize.android.routineplan.itemhelper.OnTaskStarted;
 import com.minimize.android.routineplan.itemhelper.OnTimeTick;
 import com.minimize.android.routineplan.models.Routine;
 import com.minimize.android.routineplan.models.Task;
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -34,13 +35,13 @@ public class PlayActivity extends BaseActivity {
   Routine mRoutine;
   TasksStore mTasksStore;
   private MyService mService;
+  Bus mBus;
 
-  int hours;
-  int minutes;
-  int seconds;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    mBus = new Bus(Bus.DEFAULT_IDENTIFIER);
+
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_play);
     mTasksStore = TasksStore.get(mDispatcher);
     mRoutine = Parcels.unwrap(getIntent().getParcelableExtra(Keys.ROUTINE));
@@ -58,12 +59,8 @@ public class PlayActivity extends BaseActivity {
       if (mService.getRoutineName().equals(mRoutine.getName())) {
         Timber.e("onCreate : Routine already running");
         mService.setOnTimeTick(new OnTimeTick() {
-          @Override public void onTimeTick(long totalSeconds) {
-            hours = (int) (totalSeconds / 3600);
-            minutes = (int) ((totalSeconds % 3600) / 60);
-            seconds = (int) (totalSeconds % 60);
-
-            mBinding.textViewTimer.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
+          @Override public void onTimeTick(String time) {
+            mBinding.textViewTimer.setText(time);
           }
         });
 
@@ -87,20 +84,9 @@ public class PlayActivity extends BaseActivity {
       } else {
         mActionsCreator.getTasks(mRoutine.getName());
       }
-      //mBinding.buttonPause.setOnClickListener(new View.OnClickListener() {
-      //  @Override public void onClick(View v) {
-      //    if (mService.getRoutineState(mRoutine.getName()) == MyService.PLAYING) {
-      //      mService.pauseRoutine();
-      //      mBinding.buttonPause.setText("Resume");
-      //    } else {
-      //      mService.resumeRoutine();
-      //      mBinding.buttonPause.setText("Pause");
-      //    }
-      //  }
-      //});
-      //
+
       setPauseButtonState();
-      //
+
       mBinding.cancel.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {
           mService.stopRoutine();
@@ -127,26 +113,38 @@ public class PlayActivity extends BaseActivity {
     super.onResume();
     mDispatcher.register(this);
     mDispatcher.register(mTasksStore);
+    mBus.register(this);
+    mService.setBus(mBus);
+
   }
 
   @Override protected void onPause() {
     super.onPause();
     mDispatcher.unregister(this);
     mDispatcher.unregister(mTasksStore);
+    mBus.unregister(this);
+
   }
 
+  @Subscribe public void onRoutinePause(MyService.RoutinePause routinePause){
+    setPauseButtonState();
+  }
+
+  @Subscribe public void onRoutineResume(MyService.RoutineResume routineResume) {
+    setPauseButtonState();
+  }
+
+  @Subscribe public void onRoutineStop(MyService.RoutineStop routineStop) {
+    finish();
+  }
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
 
     List<Task> tasks = tasksEvent.mTasks;
     mService.setRoutine(mRoutine.getName());
     mService.setTasks(tasks);
     mService.setOnTimeTick(new OnTimeTick() {
-      @Override public void onTimeTick(long totalSeconds) {
-        hours = (int) (totalSeconds / 3600);
-        minutes = (int) ((totalSeconds % 3600) / 60);
-        seconds = (int) (totalSeconds % 60);
-
-        mBinding.textViewTimer.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
+      @Override public void onTimeTick(String time) {
+        mBinding.textViewTimer.setText(time);
       }
     });
 

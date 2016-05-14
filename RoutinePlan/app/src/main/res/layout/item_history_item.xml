@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-  <LinearLayout
+  <RelativeLayout
       android:layout_width="match_parent"
       android:layout_height="52dp"
       android:orientation="horizontal"
@@ -15,8 +15,8 @@
         android:id="@+id/time"
         android:textSize="16sp"
         tools:text="22:00"
+        android:padding="16dp"
         android:layout_gravity="center_vertical"
-        android:padding="10dp"
         />
 
     <TextView
@@ -25,9 +25,17 @@
         android:id="@+id/routine_task"
         tools:text="Routine - Task"
         android:textSize="16sp"
-        android:padding="10dp"
+        android:padding="16dp"
+        android:layout_toRightOf="@id/time"
+        android:layout_toEndOf="@id/time"
         android:layout_gravity="center_vertical"
         />
-
-  </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:alpha="0.1"
+        android:background="@android:color/black"
+        />
+  </RelativeLayout>
 </layout>

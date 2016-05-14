@@ -22,32 +22,33 @@
         android:fontFamily="sans-serif-light"
         android:text="00:00:00"
         />
+
+
+    <TextView
+        android:id="@+id/text_view_time_remaining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/text_view_timer"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-light"
+        android:text="Time Remaining"
+        />
     <TextView
         android:id="@+id/text_view_playing_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/text_view_timer"
+        android:layout_above="@id/text_view_time_remaining"
         android:layout_centerHorizontal="true"
         android:padding="@dimen/default_margin"
         android:textSize="24sp"
         android:fontFamily="sans-serif-light"
         tools:text="Currently Playing Task"
         />
-
-    <TextView
-        android:id="@+id/text_view_time_remaining"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/text_view_timer"
-        android:layout_centerHorizontal="true"
-        android:fontFamily="sans-serif-light"
-        android:text="Time Remaining"
-        />
     <TextView
         android:id="@+id/text_view_next_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text_view_time_remaining"
+        android:layout_below="@id/text_view_timer"
         android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-light"
         android:text="Next task: "
@@ -82,7 +83,7 @@
           android:src="@drawable/ic_pause"
           android:padding="10dp"
           android:foreground="?attr/selectableItemBackground"
-          android:background="@color/colorPrimaryDark"
+          android:background="?attr/colorPrimaryDark"
           android:id="@+id/pause"
           />
 

@@ -43,8 +43,17 @@ public class ActionsCreator implements MyActions {
     return BASE_URL + "/" + user + "/Routines/";
   }
 
+  @Override public void deleteTask(String routine, Task task) {
+    String user = Prefs.getString(App.USER, null);
+    String tasksUrl = getTasksUrl(user, routine);
+    Timber.e("deleteTask : " + tasksUrl);
+    final Firebase taskRef = new Firebase(tasksUrl);
+    taskRef.child(task.getName()).removeValue();
+  }
+
   @Override public void getRoutines() {
     String user = Prefs.getString(App.USER, null);
+    Timber.e("getRoutines : " + user);
     final ContentValues contentValues = new ContentValues();
 
     final Firebase routinesRef = new Firebase(getRoutinesUrl(user));

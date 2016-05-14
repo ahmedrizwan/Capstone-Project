@@ -72,7 +72,7 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
             viewDataBinding.delete.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
-                //TODO: Delete Routine
+                mActionsCreator.deleteRoutine(item.getName());
 
               }
             });
@@ -130,7 +130,6 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
   @Override public void onResume() {
     super.onResume();
-    Timber.e("onResume : Called");
     getContext().getContentResolver().delete(DbContract.Routine.CONTENT_URI, null, null);
     mDispatcher.register(this);
     mDispatcher.register(mRoutinesStore);
@@ -139,7 +138,6 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
   @Override public void onPause() {
     super.onPause();
-    Timber.e("onPause : Called");
     mDispatcher.unregister(this);
     mDispatcher.unregister(mRoutinesStore);
   }
@@ -147,6 +145,13 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
   @Subscribe public void onRoutinesRetrieved(RoutinesStore.RoutinesEvent routinesEvent) {
     mRoutines = routinesEvent.routinesList;
     rxDataSource.updateDataSet(mRoutines).updateAdapter();
+    if (mRoutines.size() == 0) {
+      mBinding.recyclerViewRoutines.setVisibility(View.GONE);
+      mBinding.emptyView.setVisibility(View.VISIBLE);
+    }else {
+      mBinding.recyclerViewRoutines.setVisibility(View.VISIBLE);
+      mBinding.emptyView.setVisibility(View.GONE);
+    }
     Intent intent = new Intent(getContext(), WidgetProvider.class);
     intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
     int ids[] = AppWidgetManager.getInstance(getContext()).getAppWidgetIds(new ComponentName(getContext(), WidgetProvider.class));

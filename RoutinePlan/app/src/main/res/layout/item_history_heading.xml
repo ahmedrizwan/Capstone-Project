@@ -3,10 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-  <LinearLayout
+  <RelativeLayout
       android:layout_width="match_parent"
       android:layout_height="52dp"
       android:orientation="vertical"
+
       >
 
     <TextView
@@ -15,9 +16,18 @@
         android:id="@+id/heading"
         tools:text="Heading"
         android:layout_gravity="center_vertical"
-        android:textSize="22sp"
-        android:padding="10dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-light"
+        android:textStyle="bold"
+        android:padding="16dp"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:alpha="0.1"
+        android:background="@android:color/black"
         />
 
-  </LinearLayout>
+  </RelativeLayout>
 </layout>

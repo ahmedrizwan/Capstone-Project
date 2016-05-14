@@ -1,6 +1,7 @@
 package com.minimize.android.routineplan;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,11 +11,13 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
+import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.itemhelper.CountDownTimerPausable;
 import com.minimize.android.routineplan.itemhelper.OnTaskCompleted;
 import com.minimize.android.routineplan.itemhelper.OnTaskStarted;
 import com.minimize.android.routineplan.itemhelper.OnTimeTick;
 import com.minimize.android.routineplan.models.Task;
+import com.squareup.otto.Bus;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
@@ -41,6 +44,7 @@ public class MyService extends Service {
     mTasks.clear();
     mCountDownTimer.cancel();
     routine = "";
+    mNotificationManager.cancel(notifyID);
   }
 
   @IntDef({ PLAYING, PAUSED, STOPPED })
@@ -79,7 +83,6 @@ public class MyService extends Service {
     mOnTaskCompleted = onTaskCompleted;
   }
 
-
   public void setOnTaskStarted(OnTaskStarted onTaskStarted) {
     mOnTaskStarted = onTaskStarted;
   }
@@ -92,6 +95,18 @@ public class MyService extends Service {
     if (mCurrentState == PLAYING) {
       mCurrentState = PAUSED;
       mCountDownTimer.pause();
+
+      mNotifyBuilder.mActions.clear();
+
+      Intent resumeIntent = new Intent(this, MyService.class);
+      resumeIntent.setAction(Keys.RESUME);
+      Intent cancelIntent = new Intent(this, MyService.class);
+      cancelIntent.setAction(Keys.CANCEL);
+
+      mNotifyBuilder.addAction(R.drawable.ic_play, "Resume", PendingIntent.getService(this, 101, resumeIntent, 0));
+      mNotifyBuilder.addAction(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, 101, cancelIntent, 0));
+
+      mNotificationManager.notify(notifyID, mNotifyBuilder.build());
     }
   }
 
@@ -99,6 +114,20 @@ public class MyService extends Service {
     if (mCurrentState == PAUSED) {
       mCurrentState = PLAYING;
       mCountDownTimer.start();
+
+      mNotifyBuilder.mActions.clear();
+
+      Intent pauseIntent = new Intent(this, MyService.class);
+      pauseIntent.setAction(Keys.PAUSE);
+
+      Intent cancelIntent = new Intent(this, MyService.class);
+      cancelIntent.setAction(Keys.CANCEL);
+
+
+      mNotifyBuilder.addAction(R.drawable.ic_pause, "Pause", PendingIntent.getService(this, 101, pauseIntent, 0));
+      mNotifyBuilder.addAction(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, 101, cancelIntent, 0));
+
+      mNotificationManager.notify(notifyID, mNotifyBuilder.build());
     }
   }
 
@@ -125,6 +154,8 @@ public class MyService extends Service {
 
   int notifyID = 1;
   long timeRemaining = 0;
+  int hours;
+  int minutes, seconds;
 
   private void countDownTimer(final int taskIndex) {
     if (mTasks.size() > 0) {
@@ -132,8 +163,15 @@ public class MyService extends Service {
       mCountDownTimer = new CountDownTimerPausable(mTasks.get(taskIndex).getMinutes() * 60 * 1000, 1000) {
         @Override public void onTick(long millisUntilFinished) {
           timeRemaining = millisUntilFinished / 1000;
-          mOnTimeTick.onTimeTick(timeRemaining);
-          mNotifyBuilder.setContentText(mTasks.get(currentTask).getName() +" - "+timeRemaining);
+          hours = (int) (timeRemaining / 3600);
+          minutes = (int) ((timeRemaining % 3600) / 60);
+          seconds = (int) (timeRemaining % 60);
+
+          String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+          mOnTimeTick.onTimeTick(time);
+
+          mNotifyBuilder.setContentTitle("Playing " + routine + " Routine");
+          mNotifyBuilder.setContentText(mTasks.get(currentTask).getName() + " - " + time);
           mNotificationManager.notify(notifyID, mNotifyBuilder.build());
         }
 
@@ -148,7 +186,6 @@ public class MyService extends Service {
 
             currentTask = taskIndex + 1;
             countDownTimer(taskIndex + 1);
-
           } else {
             //means everything ended
             mOnTaskStarted.onTaskStarted(null, null);
@@ -157,9 +194,19 @@ public class MyService extends Service {
         }
       };
       mCountDownTimer.start();
-      mNotifyBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.ic_play)
+
+      Intent pauseIntent = new Intent(this, MyService.class);
+      pauseIntent.setAction(Keys.PAUSE);
+
+      Intent cancelIntent = new Intent(this, MyService.class);
+      cancelIntent.setAction(Keys.CANCEL);
+
+      mNotifyBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher)
           .setContentTitle("Playing Routine")
-          .setContentText(mTasks.get(currentTask).getName() +" - "+timeRemaining);
+          .addAction(new NotificationCompat.Action(R.drawable.ic_pause, "Pause", PendingIntent.getService(this, 101, pauseIntent, 0)))
+          .addAction(new NotificationCompat.Action(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, 101, cancelIntent, 0)))
+          .setContentText(mTasks.get(currentTask).getName() + " - " + timeRemaining);
+
       mNotifyBuilder.build();
 
       if (taskIndex + 1 < mTasks.size()) {
@@ -185,6 +232,29 @@ public class MyService extends Service {
     Timber.e("Service Destroyed");
   }
 
+  Bus mBus;
+
+  public void setBus(Bus bus) {
+    mBus = bus;
+  }
+
+  @Override public int onStartCommand(Intent intent, int flags, int startId) {
+    if (intent != null) {
+      if (intent.getAction() == Keys.PAUSE) {
+        pauseRoutine();
+        mBus.post(new RoutinePause());
+
+      } else if (intent.getAction() == Keys.CANCEL) {
+        stopRoutine();
+        mBus.post(new RoutineStop());
+      } else if (intent.getAction() == Keys.RESUME) {
+        resumeRoutine();
+        mBus.post(new RoutineResume());
+      }
+    }
+    return super.onStartCommand(intent, flags, startId);
+  }
+
   // Binder given to clients
   private final IBinder mBinder = new LocalBinder();
 
@@ -197,4 +267,14 @@ public class MyService extends Service {
   @Nullable @Override public IBinder onBind(final Intent intent) {
     return mBinder;
   }
+
+  public class RoutinePause {
+  }
+
+  public class RoutineResume {
+  }
+
+  public class RoutineStop {
+  }
+
 }

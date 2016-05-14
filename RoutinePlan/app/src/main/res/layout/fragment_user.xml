@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
   <ScrollView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:fillViewport="true">
+      android:fillViewport="true"
+      >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,65 +15,73 @@
 
       <de.hdodenhof.circleimageview.CircleImageView
           android:id="@+id/profile_image"
+          android:layout_width="80dp"
+          android:layout_height="80dp"
           android:layout_centerHorizontal="true"
-          android:layout_width="180dp"
-          android:layout_height="180dp"
           android:layout_margin="16dp"
           android:src="@drawable/user_image"
-          app:civ_border_width="2dp"
-          app:civ_border_color="#FF000000"/>
+          />
 
       <TextView
+          android:id="@+id/user_name"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:id="@+id/user_name"
-          android:text="Awesome User"
           android:layout_below="@id/profile_image"
           android:layout_centerHorizontal="true"
-          android:textSize="20sp"
-          android:layout_margin="16dp"
+          android:layout_marginBottom="16dp"
           android:fontFamily="sans-serif-light"
+          android:text="Awesome User"
+          android:textColor="@android:color/black"
+          android:textSize="16sp"
           />
 
       <Button
-          android:layout_width="300dp"
-          android:layout_height="wrap_content"
-          android:layout_centerHorizontal="true"
-          android:text="Preferences"
-          android:background="@android:color/white"
-          android:layout_below="@id/user_name"
           android:id="@+id/preferences"
+          android:layout_width="300dp"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/user_name"
+          android:layout_centerHorizontal="true"
+          android:background="@android:color/white"
+          android:text="Preferences"
           />
 
       <Button
-          android:layout_width="300dp"
-          android:layout_height="wrap_content"
-          android:layout_centerHorizontal="true"
-          android:text="About"
-          android:background="@android:color/white"
-          android:layout_below="@id/preferences"
           android:id="@+id/about"
+          android:layout_width="300dp"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/preferences"
+          android:layout_centerHorizontal="true"
+          android:background="@android:color/white"
+          android:text="About"
           />
 
       <Button
+          android:id="@+id/logout"
           android:layout_width="300dp"
           android:layout_height="wrap_content"
-          android:layout_centerHorizontal="true"
-          android:text="Logout"
-          android:background="@android:color/white"
           android:layout_below="@id/about"
-          android:id="@+id/logout"
+          android:layout_centerHorizontal="true"
+          android:background="@android:color/white"
+          android:text="Logout"
 
           />
 
 
       <com.google.android.gms.common.SignInButton
           android:id="@+id/sign_in_button"
-          android:layout_centerHorizontal="true"
-          android:layout_below="@id/logout"
-          android:layout_margin="16dp"
           android:layout_width="300dp"
-          android:layout_height="wrap_content" />
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:layout_centerHorizontal="true"
+          android:layout_margin="16dp"
+          />
+
+      <View
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_above="@id/sign_in_button"
+          android:layout_below="@id/logout"
+          />
 
     </RelativeLayout>
   </ScrollView>

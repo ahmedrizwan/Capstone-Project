@@ -14,4 +14,8 @@ public interface Keys {
   String NAME = "name";
   String PHOTO_URL = "photo_url";
   String HISTORY = "get_history";
+  String THEME = "theme";
+  String PAUSE = "pause";
+  String RESUME = "resume";
+  String CANCEL = "cancel";
 }

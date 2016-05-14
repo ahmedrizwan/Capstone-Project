@@ -1,15 +1,225 @@
 <resources>
+  <color name="redColorAccent">#ffff0046</color>
+  <color name="redColorPrimaryDark">#ff9c0029</color>
+  <color name="redColorPrimary">#d80039</color>
 
   <!-- Base application theme. -->
   <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
     <!-- Customize your theme here. -->
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorPrimary">@color/redColorPrimary</item>
+    <item name="colorPrimaryDark">@color/redColorPrimaryDark</item>
+    <item name="colorAccent">@color/redColorAccent</item>
   </style>
 
   <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
     <item name="android:windowBackground">@drawable/background_splash</item>
+  </style>
+
+
+
+  <!--Green Colors-->
+  <color name="green">#4CAF50</color>
+  <color name="greenDark">#388E3C</color>
+
+  <style name="AppTheme.GreenTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/green</item>
+    <item name="colorPrimaryDark">@color/greenDark</item>
+    <item name="colorAccent">@color/green</item>
+    <item name="actionModeBackground">@color/green</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.GreenTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.GreenTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/green</item>
+  </style>
+
+  <!--Blue Colors-->
+  <color name="blue">#2196F3</color>
+  <color name="blueDark">#1976D2</color>
+
+  <style name="AppTheme.BlueTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/blue</item>
+    <item name="colorPrimaryDark">@color/blueDark</item>
+    <item name="colorAccent">@color/blue</item>
+    <item name="actionModeBackground">@color/blue</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.BlueTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.BlueTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/blue</item>
+  </style>
+
+
+  <!--Orange Colors-->
+  <color name="orange">#FF9800</color>
+  <color name="orangeDark">#F57C00</color>
+
+  <style name="AppTheme.OrangeTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/orange</item>
+    <item name="colorPrimaryDark">@color/orangeDark</item>
+    <item name="colorAccent">@color/orange</item>
+    <item name="actionModeBackground">@color/orange</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.OrangeTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.OrangeTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/orange</item>
+  </style>
+
+  <!--Purple Colors-->
+  <color name="purple">#9C27B0</color>
+  <color name="purpleDark">#7B1FA2</color>
+
+  <style name="AppTheme.PurpleTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/purple</item>
+    <item name="colorPrimaryDark">@color/purpleDark</item>
+    <item name="colorAccent">@color/purple</item>
+    <item name="actionModeBackground">@color/purple</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.PurpleTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.PurpleTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/purple</item>
+  </style>
+
+
+  <!--Brown Colors-->
+  <color name="brown">#795548</color>
+  <color name="brownDark">#5D4037</color>
+
+
+  <style name="AppTheme.BrownTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/brown</item>
+    <item name="colorPrimaryDark">@color/brownDark</item>
+    <item name="colorAccent">@color/brown</item>
+    <item name="actionModeBackground">@color/brown</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.BrownTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.BrownTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/brown</item>
+  </style>
+
+
+  <!--Lime Colors-->
+  <color name="lime">#C0CA33</color>
+  <color name="limeDark">#9E9D24</color>
+
+  <style name="AppTheme.LimeTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/lime</item>
+    <item name="colorPrimaryDark">@color/limeDark</item>
+    <item name="colorAccent">@color/lime</item>
+    <item name="actionModeBackground">@color/lime</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.LimeTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.LimeTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/lime</item>
+  </style>
+
+
+  <!--Gray Colors-->
+  <color name="grey">#607D8B</color>
+  <color name="greyDark">#455A64</color>
+
+  <style name="AppTheme.GreyTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/grey</item>
+    <item name="colorPrimaryDark">@color/greyDark</item>
+    <item name="colorAccent">@color/grey</item>
+    <item name="actionModeBackground">@color/grey</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.GreyTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.GreyTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/grey</item>
+  </style>
+
+
+  <!--Indigo Colors-->
+  <color name="indigo">#3F51B5</color>
+  <color name="indigoDark">#303F9F</color>
+
+  <style name="AppTheme.IndigoTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/indigo</item>
+    <item name="colorPrimaryDark">@color/indigoDark</item>
+    <item name="colorAccent">@color/indigo</item>
+    <item name="actionModeBackground">@color/indigo</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.IndigoTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.IndigoTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/indigo</item>
+  </style>
+
+  <!--Cyan Colors-->
+  <color name="cyan">#00ACC1</color>
+  <color name="cyanDark">#00838F</color>
+
+  <style name="AppTheme.CyanTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/cyan</item>
+    <item name="colorPrimaryDark">@color/cyanDark</item>
+    <item name="colorAccent">@color/cyan</item>
+    <item name="actionModeBackground">@color/cyan</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.CyanTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.CyanTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/cyan</item>
+  </style>
+
+  <!--Deep Orange Colors-->
+  <color name="deepOrange">#F4511E</color>
+  <color name="deepOrangeDark">#D84315</color>
+
+  <style name="AppTheme.DeepOrangeTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/deepOrange</item>
+    <item name="colorPrimaryDark">@color/deepOrangeDark</item>
+    <item name="colorAccent">@color/deepOrange</item>
+    <item name="actionModeBackground">@color/deepOrange</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.DeepOrangeTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.DeepOrangeTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/deepOrange</item>
+  </style>
+
+  <!--Teal  Colors-->
+  <color name="teal">#00897B</color>
+  <color name="tealDark">#00695C</color>
+
+  <style name="AppTheme.TealTheme" parent="AppTheme">
+    <item name="colorPrimary">@color/teal</item>
+    <item name="colorPrimaryDark">@color/tealDark</item>
+    <item name="colorAccent">@color/teal</item>
+    <item name="actionModeBackground">@color/teal</item>
+    <item name="android:alertDialogTheme">@style/AppTheme.TealTheme.Dialog</item>
+  </style>
+
+  <style name="AppTheme.TealTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    <item name="colorAccent">@color/teal</item>
   </style>
 
 

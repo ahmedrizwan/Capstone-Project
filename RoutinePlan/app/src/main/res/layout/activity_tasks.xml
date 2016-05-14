@@ -15,27 +15,6 @@
 
         >
 
-      <!--<RadioGroup-->
-          <!--android:id="@+id/radio_group_break"-->
-          <!--android:layout_width="match_parent"-->
-          <!--android:layout_height="wrap_content"-->
-          <!--android:padding="16dp"-->
-          <!--&gt;-->
-
-        <!--<RadioButton-->
-            <!--android:id="@+id/radio_five_minutes"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="5 Mins"-->
-            <!--/>-->
-
-        <!--<RadioButton-->
-            <!--android:id="@+id/radio_ten_minutes"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="10 Mins"-->
-            <!--/>-->
-      <!--</RadioGroup>-->
 
       <TextView
           android:layout_width="match_parent"
@@ -52,26 +31,60 @@
           android:layout_weight="1"
           />
 
+      <TextView
+          android:id="@+id/empty_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:visibility="gone"
+          android:fontFamily="sans-serif-light"
+          android:textColor="@android:color/black"
+          android:text="@string/display_no_tasks" />
+
+      <RadioGroup
+          android:id="@+id/radio_group_break"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:padding="@dimen/default_margin"
+          >
+
+        <RadioButton
+            android:id="@+id/radio_five_minutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="5 Mins Break"
+            />
+
+        <RadioButton
+            android:id="@+id/radio_ten_minutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="10 Mins Break"
+            />
+      </RadioGroup>
 
       <ImageView
+          android:id="@+id/play"
           android:layout_width="match_parent"
           android:layout_height="60dp"
-          android:padding="10dp"
+          android:background="?attr/colorPrimaryDark"
           android:foreground="?attr/selectableItemBackground"
-          android:id="@+id/play"
+          android:padding="10dp"
           android:src="@drawable/ic_play"
-          android:background="@color/colorPrimaryDark"
           />
     </LinearLayout>
 
     <!--<android.support.design.widget.FloatingActionButton-->
-        <!--android:id="@+id/fab"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="bottom|end"-->
-        <!--android:layout_margin="@dimen/fab_margin"-->
-        <!--android:src="@drawable/ic_play"-->
-        <!--/>-->
+    <!--android:id="@+id/fab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="@dimen/fab_margin"-->
+    <!--android:src="@drawable/ic_play"-->
+    <!--/>-->
 
   </android.support.design.widget.CoordinatorLayout>
 </layout>
