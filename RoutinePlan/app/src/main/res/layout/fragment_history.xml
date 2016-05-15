@@ -23,6 +23,6 @@
         android:visibility="gone"
         android:fontFamily="sans-serif-light"
         android:textColor="@android:color/black"
-        android:text="No History Available" />
+        android:text="@string/no_history_available" />
   </LinearLayout>
 </layout>

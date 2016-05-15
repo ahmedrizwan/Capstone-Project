@@ -5,35 +5,35 @@
     android:layout_height="match_parent">
 
   <LinearLayout
-      android:layout_width="300dp"
+      android:layout_width="@dimen/color_row_width"
       android:layout_gravity="center"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
       >
     <ImageView
         android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_height="@dimen/list_item_size_large"
         android:id="@+id/green"
         android:foreground="?attr/selectableItemBackground"
         android:layout_weight="1"
         android:src="@drawable/circle_green"/>
     <ImageView
         android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_height="@dimen/list_item_size_large"
         android:id="@+id/blue"
         android:layout_weight="1"
         android:foreground="?attr/selectableItemBackground"
         android:src="@drawable/circle_blue"/>
     <ImageView
         android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_height="@dimen/list_item_size_large"
         android:id="@+id/orange"
         android:layout_weight="1"
         android:foreground="?attr/selectableItemBackground"
         android:src="@drawable/circle_orange"/>
     <ImageView
         android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_height="@dimen/list_item_size_large"
         android:id="@+id/red"
         android:layout_weight="1"
         android:foreground="?attr/selectableItemBackground"

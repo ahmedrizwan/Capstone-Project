@@ -21,6 +21,7 @@ import timber.log.Timber;
 public class App extends Application {
 
   public static final String USER = "user";
+  public static final String GCM_TOKEN = "gcm_token";
   private Firebase mFirebaseRef;
   private Dispatcher dispatcher;
   private ActionsCreator actionsCreator;

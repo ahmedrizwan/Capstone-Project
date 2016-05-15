@@ -30,7 +30,6 @@
           android:textColor="@android:color/black"
           android:text="@string/display_no_routines" />
 
-
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton

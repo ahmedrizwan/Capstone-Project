@@ -12,9 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-
         >
-
 
       <TextView
           android:layout_width="match_parent"
@@ -54,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="5 Mins Break"
+            android:text="@string/five_mins_break"
             />
 
         <RadioButton
@@ -62,29 +60,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="10 Mins Break"
+            android:text="@string/ten_mins_break"
             />
       </RadioGroup>
 
       <ImageView
           android:id="@+id/play"
           android:layout_width="match_parent"
-          android:layout_height="60dp"
+          android:layout_height="@dimen/list_item_size"
           android:background="?attr/colorPrimaryDark"
           android:foreground="?attr/selectableItemBackground"
-          android:padding="10dp"
+          android:padding="@dimen/medium_padding"
           android:src="@drawable/ic_play"
           />
     </LinearLayout>
-
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fab"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom|end"-->
-    <!--android:layout_margin="@dimen/fab_margin"-->
-    <!--android:src="@drawable/ic_play"-->
-    <!--/>-->
 
   </android.support.design.widget.CoordinatorLayout>
 </layout>

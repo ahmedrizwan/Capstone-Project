@@ -1,5 +1,6 @@
 package com.minimize.android.routineplan.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -12,6 +13,7 @@ import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.databinding.ActivityPlayBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
+import com.minimize.android.routineplan.gcm.GCMRequest;
 import com.minimize.android.routineplan.itemhelper.OnTaskCompleted;
 import com.minimize.android.routineplan.itemhelper.OnTaskStarted;
 import com.minimize.android.routineplan.itemhelper.OnTimeTick;
@@ -37,25 +39,27 @@ public class PlayActivity extends BaseActivity {
   private MyService mService;
   Bus mBus;
 
-
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mBus = new Bus(Bus.DEFAULT_IDENTIFIER);
 
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_play);
     mTasksStore = TasksStore.get(mDispatcher);
-    mRoutine = Parcels.unwrap(getIntent().getParcelableExtra(Keys.ROUTINE));
-
-    ActionBar supportActionBar = getSupportActionBar();
-    if (supportActionBar != null) {
-      supportActionBar.setTitle("Playing: " + mRoutine.getName() + " Routine");
-      supportActionBar.setDisplayHomeAsUpEnabled(true);
-    }
-    Timber.e("onCreate : Break Interval " + mRoutine.getBreakInterval());
 
     App application = (App) getApplication();
     if (application.isServiceBound()) {
       mService = application.getServiceInstance();
+      mRoutine = Parcels.unwrap(getIntent().getParcelableExtra(Keys.ROUTINE));
+      if (mRoutine == null) {
+        mRoutine = mService.getRoutine();
+        mBinding.textViewTimer.setText(mService.getCurrentTime());
+      }
+      ActionBar supportActionBar = getSupportActionBar();
+      if (supportActionBar != null) {
+        supportActionBar.setTitle("Playing: " + mRoutine.getName() + " Routine");
+        supportActionBar.setDisplayHomeAsUpEnabled(true);
+      }
+
       if (mService.getRoutineName().equals(mRoutine.getName())) {
         Timber.e("onCreate : Routine already running");
         mService.setOnTimeTick(new OnTimeTick() {
@@ -90,6 +94,11 @@ public class PlayActivity extends BaseActivity {
       mBinding.cancel.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {
           mService.stopRoutine();
+          //start tasks activity
+          Intent intent = new Intent(PlayActivity.this, TasksActivity.class);
+          intent.putExtra(Keys.ROUTINE, Parcels.wrap(mRoutine));
+          startActivity(intent);
+
           finish();
         }
       });
@@ -104,8 +113,6 @@ public class PlayActivity extends BaseActivity {
           }
         }
       });
-    } else {
-      Timber.e("onCreate : Service not bound bruh!");
     }
   }
 
@@ -115,7 +122,7 @@ public class PlayActivity extends BaseActivity {
     mDispatcher.register(mTasksStore);
     mBus.register(this);
     mService.setBus(mBus);
-
+    mService.setRoutine(mRoutine);
   }
 
   @Override protected void onPause() {
@@ -123,10 +130,9 @@ public class PlayActivity extends BaseActivity {
     mDispatcher.unregister(this);
     mDispatcher.unregister(mTasksStore);
     mBus.unregister(this);
-
   }
 
-  @Subscribe public void onRoutinePause(MyService.RoutinePause routinePause){
+  @Subscribe public void onRoutinePause(MyService.RoutinePause routinePause) {
     setPauseButtonState();
   }
 
@@ -137,10 +143,19 @@ public class PlayActivity extends BaseActivity {
   @Subscribe public void onRoutineStop(MyService.RoutineStop routineStop) {
     finish();
   }
+
   @Subscribe public void onTasksRetrieved(TasksStore.TasksEvent tasksEvent) {
 
     List<Task> tasks = tasksEvent.mTasks;
     mService.setRoutine(mRoutine.getName());
+    if (tasks.size() > 1) {
+      for (int i = 0; i < tasks.size(); i++) {
+        if (i + 1 < tasks.size() && !tasks.get(i).getName().equals("Break")) {
+          tasks.add(i + 1, new Task("Break", mRoutine.getBreakInterval()));
+        }
+      }
+    }
+
     mService.setTasks(tasks);
     mService.setOnTimeTick(new OnTimeTick() {
       @Override public void onTimeTick(String time) {
@@ -161,6 +176,8 @@ public class PlayActivity extends BaseActivity {
           mBinding.textViewTimer.setText("00:00");
           finish();
         }
+        //TODO: Send start notification to topic
+        new GCMRequest().execute("Start");
       }
     });
 
@@ -181,6 +198,9 @@ public class PlayActivity extends BaseActivity {
         Timber.e("onTaskCompleted : " + time);
 
         mActionsCreator.saveHistory(routine, task, date, time);
+
+        //start break if there's no task ahead
+
       }
     });
 

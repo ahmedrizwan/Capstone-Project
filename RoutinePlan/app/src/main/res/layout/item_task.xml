@@ -44,7 +44,7 @@
     <RelativeLayout
         android:id="@+id/routine_item"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="@dimen/list_item_size"
         android:background="@android:color/white"
 
         >
@@ -58,7 +58,7 @@
           android:layout_centerVertical="true"
           android:fontFamily="sans-serif"
           android:textColor="@android:color/black"
-          android:textSize="16sp"
+          android:textSize="@dimen/tv_size_normal"
           tools:text="Test"
           />
 
@@ -75,16 +75,7 @@
           android:fontFamily="sans-serif-light"
           android:text="@string/tap_to_add_tasks"
           />
-      <!--<ImageView-->
-      <!--android:id="@+id/image_view_play_routine"-->
-      <!--android:layout_width="52dp"-->
-      <!--android:layout_height="52dp"-->
-      <!--android:layout_alignBottom="@id/text_view_task_time"-->
-      <!--android:layout_alignParentEnd="true"-->
-      <!--android:layout_alignParentRight="true"-->
-      <!--android:layout_alignTop="@id/text_view_routine_name"-->
-      <!--android:src="@drawable/ic_play"-->
-      <!--/>-->
+
       <View
           android:layout_width="match_parent"
           android:layout_height="1dp"

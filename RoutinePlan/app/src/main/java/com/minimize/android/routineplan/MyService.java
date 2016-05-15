@@ -11,11 +11,13 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
+import com.minimize.android.routineplan.activity.PlayActivity;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.itemhelper.CountDownTimerPausable;
 import com.minimize.android.routineplan.itemhelper.OnTaskCompleted;
 import com.minimize.android.routineplan.itemhelper.OnTaskStarted;
 import com.minimize.android.routineplan.itemhelper.OnTimeTick;
+import com.minimize.android.routineplan.models.Routine;
 import com.minimize.android.routineplan.models.Task;
 import com.squareup.otto.Bus;
 import java.lang.annotation.Retention;
@@ -28,6 +30,23 @@ public class MyService extends Service {
   @RoutineState int mCurrentState = STOPPED;
   private NotificationManager mNotificationManager;
   private NotificationCompat.Builder mNotifyBuilder;
+  public Routine mRoutine;
+
+  public final int REQUEST_CODE = 101;
+
+  public String getCurrentTime() {
+    return currentTime;
+  }
+
+  private String currentTime;
+
+  public void setRoutine(Routine routine) {
+    mRoutine = routine;
+  }
+
+  public Routine getRoutine() {
+    return mRoutine;
+  }
 
   public void setTextViews(TextView textViewPlayingTask, TextView textViewNextTask) {
     Task task = mTasks.get(currentTask);
@@ -41,8 +60,10 @@ public class MyService extends Service {
 
   public void stopRoutine() {
     mCurrentState = STOPPED;
-    mTasks.clear();
-    mCountDownTimer.cancel();
+    if (mTasks != null) mTasks.clear();
+    if (mCountDownTimer != null) {
+      mCountDownTimer.cancel();
+    }
     routine = "";
     mNotificationManager.cancel(notifyID);
   }
@@ -57,7 +78,11 @@ public class MyService extends Service {
   public static final int PAUSED = 2;
 
   @RoutineState public int getRoutineState(String routineName) {
-    return mCurrentState;
+    if (mRoutine != null && mRoutine.getName().equals(routineName)) {
+      return mCurrentState;
+    } else {
+      return STOPPED;
+    }
   }
 
   public void setRoutineState(@RoutineState int state) {
@@ -102,9 +127,11 @@ public class MyService extends Service {
       resumeIntent.setAction(Keys.RESUME);
       Intent cancelIntent = new Intent(this, MyService.class);
       cancelIntent.setAction(Keys.CANCEL);
+      Intent appIntent = new Intent(this, PlayActivity.class);
 
-      mNotifyBuilder.addAction(R.drawable.ic_play, "Resume", PendingIntent.getService(this, 101, resumeIntent, 0));
-      mNotifyBuilder.addAction(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, 101, cancelIntent, 0));
+      mNotifyBuilder.setContentIntent(PendingIntent.getActivity(this, REQUEST_CODE, appIntent, 0));
+      mNotifyBuilder.addAction(R.drawable.ic_play, "Resume", PendingIntent.getService(this, REQUEST_CODE, resumeIntent, 0));
+      mNotifyBuilder.addAction(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, REQUEST_CODE, cancelIntent, 0));
 
       mNotificationManager.notify(notifyID, mNotifyBuilder.build());
     }
@@ -123,9 +150,11 @@ public class MyService extends Service {
       Intent cancelIntent = new Intent(this, MyService.class);
       cancelIntent.setAction(Keys.CANCEL);
 
+      Intent appIntent = new Intent(this, PlayActivity.class);
 
-      mNotifyBuilder.addAction(R.drawable.ic_pause, "Pause", PendingIntent.getService(this, 101, pauseIntent, 0));
-      mNotifyBuilder.addAction(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, 101, cancelIntent, 0));
+      mNotifyBuilder.setContentIntent(PendingIntent.getActivity(this, REQUEST_CODE, appIntent, 0));
+      mNotifyBuilder.addAction(R.drawable.ic_pause, "Pause", PendingIntent.getService(this, REQUEST_CODE, pauseIntent, 0));
+      mNotifyBuilder.addAction(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, REQUEST_CODE, cancelIntent, 0));
 
       mNotificationManager.notify(notifyID, mNotifyBuilder.build());
     }
@@ -149,6 +178,9 @@ public class MyService extends Service {
     if (mCurrentState == STOPPED) {
       mCurrentState = PLAYING;
       countDownTimer(currentTask);
+    } else {
+      //stopRoutine();
+      //start();
     }
   }
 
@@ -167,16 +199,15 @@ public class MyService extends Service {
           minutes = (int) ((timeRemaining % 3600) / 60);
           seconds = (int) (timeRemaining % 60);
 
-          String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-          mOnTimeTick.onTimeTick(time);
+          currentTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+          mOnTimeTick.onTimeTick(currentTime);
 
           mNotifyBuilder.setContentTitle("Playing " + routine + " Routine");
-          mNotifyBuilder.setContentText(mTasks.get(currentTask).getName() + " - " + time);
+          mNotifyBuilder.setContentText(mTasks.get(currentTask).getName() + " - " + currentTime);
           mNotificationManager.notify(notifyID, mNotifyBuilder.build());
         }
 
         @Override public void onFinish() {
-          Timber.e("onFinish : Finished");
           if (mOnTaskCompleted != null) {
             Task task = mTasks.get(currentTask);
             mOnTaskCompleted.onTaskCompleted(routine, task);
@@ -190,6 +221,7 @@ public class MyService extends Service {
             //means everything ended
             mOnTaskStarted.onTaskStarted(null, null);
             mCurrentState = STOPPED;
+            mNotificationManager.cancel(notifyID);
           }
         }
       };
@@ -201,10 +233,13 @@ public class MyService extends Service {
       Intent cancelIntent = new Intent(this, MyService.class);
       cancelIntent.setAction(Keys.CANCEL);
 
+      Intent appIntent = new Intent(this, PlayActivity.class);
+
       mNotifyBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher)
           .setContentTitle("Playing Routine")
-          .addAction(new NotificationCompat.Action(R.drawable.ic_pause, "Pause", PendingIntent.getService(this, 101, pauseIntent, 0)))
-          .addAction(new NotificationCompat.Action(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, 101, cancelIntent, 0)))
+          .setContentIntent(PendingIntent.getActivity(this, REQUEST_CODE, appIntent, 0))
+          .addAction(new NotificationCompat.Action(R.drawable.ic_pause, "Pause", PendingIntent.getService(this, REQUEST_CODE, pauseIntent, 0)))
+          .addAction(new NotificationCompat.Action(R.drawable.ic_cancel, "Cancel", PendingIntent.getService(this, REQUEST_CODE, cancelIntent, 0)))
           .setContentText(mTasks.get(currentTask).getName() + " - " + timeRemaining);
 
       mNotifyBuilder.build();
@@ -243,7 +278,6 @@ public class MyService extends Service {
       if (intent.getAction() == Keys.PAUSE) {
         pauseRoutine();
         mBus.post(new RoutinePause());
-
       } else if (intent.getAction() == Keys.CANCEL) {
         stopRoutine();
         mBus.post(new RoutineStop());
@@ -276,5 +310,4 @@ public class MyService extends Service {
 
   public class RoutineStop {
   }
-
 }

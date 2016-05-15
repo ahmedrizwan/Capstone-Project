@@ -2,4 +2,9 @@
   <string name="app_name">RoutinePlan</string>
   <string name="display_no_tasks">Tap on + to add tasks...</string>
   <string name="display_no_routines">Tap on + to add Routines...</string>
+  <string name="time_remaining">Time Remaining</string>
+  <string name="next_task">Next task:</string>
+  <string name="five_mins_break">5 Mins Break</string>
+  <string name="ten_mins_break">10 Mins Break</string>
+  <string name="no_history_available">No History Available</string>
 </resources>

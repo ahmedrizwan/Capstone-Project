@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
   <ScrollView
@@ -8,9 +9,11 @@
       android:fillViewport="true"
       >
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
         >
 
       <de.hdodenhof.circleimageview.CircleImageView
@@ -18,8 +21,10 @@
           android:layout_width="80dp"
           android:layout_height="80dp"
           android:layout_centerHorizontal="true"
+          android:layout_gravity="center_horizontal"
           android:layout_margin="16dp"
-          android:src="@drawable/user_image"
+          android:src="@drawable/ic_account"
+          app:civ_fill_color="?attr/colorPrimary"
           />
 
       <TextView
@@ -28,6 +33,7 @@
           android:layout_height="wrap_content"
           android:layout_below="@id/profile_image"
           android:layout_centerHorizontal="true"
+          android:layout_gravity="center_horizontal"
           android:layout_marginBottom="16dp"
           android:fontFamily="sans-serif-light"
           android:text="Awesome User"
@@ -76,13 +82,8 @@
           android:layout_margin="16dp"
           />
 
-      <View
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_above="@id/sign_in_button"
-          android:layout_below="@id/logout"
-          />
 
-    </RelativeLayout>
+
+    </LinearLayout>
   </ScrollView>
 </layout>

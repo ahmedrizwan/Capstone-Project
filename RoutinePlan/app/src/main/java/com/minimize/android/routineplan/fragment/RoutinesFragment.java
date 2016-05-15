@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.minimize.android.routineplan.App;
+import com.minimize.android.routineplan.MyService;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.data.DbContract;
@@ -27,6 +29,7 @@ import com.minimize.android.routineplan.models.Routine;
 import com.minimize.android.routineplan.widget.WidgetProvider;
 import com.minimize.android.rxrecycleradapter.RxDataSource;
 import com.minimize.android.rxrecycleradapter.SimpleViewHolder;
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +48,10 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
   RxDataSource<Routine> rxDataSource;
   private List<Routine> mRoutines;
 
+  MyService mService;
+  Bus mBus = new Bus(Bus.DEFAULT_IDENTIFIER);
+
+
   @Nullable @Override
   public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
     getActivity().getSupportLoaderManager().initLoader(0, null, this);
@@ -54,13 +61,28 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
     mRoutinesStore = RoutinesStore.get(getContext(), mDispatcher);
 
+    App application = (App) getActivity().getApplication();
+    if (application.isServiceBound()) {
+      mService = application.getServiceInstance();
+    }
+
     rxDataSource = new RxDataSource<>(Collections.<Routine>emptyList());
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
         new Action1<SimpleViewHolder<Routine, ItemRoutineBinding>>() {
           @Override public void call(final SimpleViewHolder<Routine, ItemRoutineBinding> viewHolder) {
             final ItemRoutineBinding viewDataBinding = viewHolder.getViewDataBinding();
             final Routine item = viewHolder.getItem();
-            viewDataBinding.textViewRoutineName.setText(item.getName());
+
+            viewDataBinding.getRoot().setHasTransientState(true);
+
+            if (mService != null && mService.getRoutineState(item.getName()) == MyService.PLAYING) {
+              viewDataBinding.textViewRoutineName.setText(item.getName() + " - Playing!");
+            } else if (mService != null && mService.getRoutineState(item.getName()) == MyService.PAUSED) {
+              viewDataBinding.textViewRoutineName.setText(item.getName() + " - Paused!");
+            } else {
+              viewDataBinding.textViewRoutineName.setText(item.getName());
+            }
+
             if (item.getTotalMinutes() > 0) {
               viewDataBinding.textViewTaskTime.setText(TasksActivity.convertMinutesToString(item.getTotalMinutes()));
             }
@@ -73,9 +95,9 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
             viewDataBinding.delete.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
                 mActionsCreator.deleteRoutine(item.getName());
-
               }
             });
+
             viewDataBinding.rename.setOnClickListener(new View.OnClickListener() {
               @Override public void onClick(View v) {
                 new MaterialDialog.Builder(getContext()).title("Rename " + item.getName() + " Routine")
@@ -125,19 +147,34 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-
   }
 
   @Override public void onResume() {
     super.onResume();
-    getContext().getContentResolver().delete(DbContract.Routine.CONTENT_URI, null, null);
     mDispatcher.register(this);
     mDispatcher.register(mRoutinesStore);
     mActionsCreator.getRoutines();
+    mBus.register(this);
+    if (mService != null) {
+      mService.setBus(mBus);
+    }
+  }
+
+  @Subscribe public void onRoutinePause(MyService.RoutinePause routinePause){
+    rxDataSource.getRxAdapter().notifyDataSetChanged();
+  }
+
+  @Subscribe public void onRoutineResume(MyService.RoutineResume routineResume) {
+    rxDataSource.getRxAdapter().notifyDataSetChanged();
+  }
+
+  @Subscribe public void onRoutineStop(MyService.RoutineStop routineStop) {
+    rxDataSource.getRxAdapter().notifyDataSetChanged();
   }
 
   @Override public void onPause() {
     super.onPause();
+    mBus.unregister(this);
     mDispatcher.unregister(this);
     mDispatcher.unregister(mRoutinesStore);
   }
@@ -148,10 +185,11 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
     if (mRoutines.size() == 0) {
       mBinding.recyclerViewRoutines.setVisibility(View.GONE);
       mBinding.emptyView.setVisibility(View.VISIBLE);
-    }else {
+    } else {
       mBinding.recyclerViewRoutines.setVisibility(View.VISIBLE);
       mBinding.emptyView.setVisibility(View.GONE);
     }
+
     Intent intent = new Intent(getContext(), WidgetProvider.class);
     intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
     int ids[] = AppWidgetManager.getInstance(getContext()).getAppWidgetIds(new ComponentName(getContext(), WidgetProvider.class));

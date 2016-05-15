@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textSize="46sp"
+        android:textSize="@dimen/tv_large"
         android:fontFamily="sans-serif-light"
         android:text="00:00:00"
         />
@@ -31,7 +31,7 @@
         android:layout_above="@id/text_view_timer"
         android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-light"
-        android:text="Time Remaining"
+        android:text="@string/time_remaining"
         />
     <TextView
         android:id="@+id/text_view_playing_task"
@@ -40,7 +40,7 @@
         android:layout_above="@id/text_view_time_remaining"
         android:layout_centerHorizontal="true"
         android:padding="@dimen/default_margin"
-        android:textSize="24sp"
+        android:textSize="@dimen/tv_heading"
         android:fontFamily="sans-serif-light"
         tools:text="Currently Playing Task"
         />
@@ -51,29 +51,13 @@
         android:layout_below="@id/text_view_timer"
         android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-light"
-        android:text="Next task: "
+        android:text="@string/next_task"
         />
 
-    <!--<Button-->
-        <!--android:id="@+id/button_cancel"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:text="Cancel"-->
-        <!--/>-->
-
-    <!--<Button-->
-        <!--android:id="@+id/button_pause"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!---->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Pause"-->
-        <!--/>-->
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="@dimen/list_item_size"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
       <ImageView
@@ -81,7 +65,7 @@
           android:layout_height="match_parent"
           android:layout_weight="1"
           android:src="@drawable/ic_pause"
-          android:padding="10dp"
+          android:padding="@dimen/medium_padding"
           android:foreground="?attr/selectableItemBackground"
           android:background="?attr/colorPrimaryDark"
           android:id="@+id/pause"
@@ -95,7 +79,7 @@
           android:background="@color/danger"
           android:id="@+id/cancel"
           android:src="@drawable/ic_cancel"
-          android:padding="10dp"
+          android:padding="@dimen/medium_padding"
           />
     </LinearLayout>
   </RelativeLayout>

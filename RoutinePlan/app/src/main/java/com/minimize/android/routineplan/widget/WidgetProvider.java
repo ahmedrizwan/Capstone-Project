@@ -25,6 +25,7 @@ public class WidgetProvider extends AppWidgetProvider {
         } else {
           views.setRemoteAdapter(appWidgetId, R.id.routines_list, intent);
         }
+
         Intent launchActivity = new Intent(context, SplashActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 230, launchActivity,
             PendingIntent.FLAG_UPDATE_CURRENT);

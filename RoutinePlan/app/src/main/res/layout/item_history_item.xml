@@ -5,7 +5,7 @@
 
   <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="52dp"
+      android:layout_height="@dimen/list_item_size_small"
       android:orientation="horizontal"
       >
 
@@ -13,9 +13,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/time"
-        android:textSize="16sp"
+        android:textSize="@dimen/tv_size_normal"
         tools:text="22:00"
-        android:padding="16dp"
+        android:padding="@dimen/tv_size_normal"
         android:layout_gravity="center_vertical"
         />
 
@@ -24,8 +24,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/routine_task"
         tools:text="Routine - Task"
-        android:textSize="16sp"
-        android:padding="16dp"
+        android:textSize="@dimen/tv_size_normal"
+        android:padding="@dimen/tv_size_normal"
         android:layout_toRightOf="@id/time"
         android:layout_toEndOf="@id/time"
         android:layout_gravity="center_vertical"

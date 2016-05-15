@@ -6,7 +6,7 @@
   <com.chauthai.swipereveallayout.SwipeRevealLayout
       android:layout_width="match_parent"
       android:id="@+id/swipe_routine_layout"
-      android:layout_height="72dp"
+      android:layout_height="@dimen/list_item_size_large"
       app:mode="same_level"
       android:foreground="?attr/selectableItemBackground"
       android:clickable="true"
@@ -19,7 +19,7 @@
         android:orientation="horizontal">
 
       <ImageView
-          android:layout_width="70dp"
+          android:layout_width="@dimen/reveal_button_width"
           android:layout_height="match_parent"
           android:layout_gravity="end"
           android:background="?attr/colorPrimaryDark"
@@ -29,7 +29,7 @@
           />
 
       <ImageView
-          android:layout_width="70dp"
+          android:layout_width="@dimen/reveal_button_width"
           android:layout_height="match_parent"
           android:layout_gravity="end"
           android:background="@color/danger"
@@ -43,34 +43,37 @@
     <RelativeLayout
         android:id="@+id/routine_item"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="match_parent"
         android:background="@android:color/white"
 
         >
 
-      <TextView
-          android:id="@+id/text_view_routine_name"
+      <LinearLayout
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:orientation="vertical"
           android:layout_marginLeft="@dimen/default_margin"
           android:layout_marginStart="@dimen/default_margin"
           android:layout_marginTop="@dimen/default_margin"
-          android:fontFamily="sans-serif"
-          android:textColor="@android:color/black"
-          android:textSize="16sp"
-          tools:text="Test"
-          />
+          >
+        <TextView
+            android:id="@+id/text_view_routine_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/tv_size_normal"
+            tools:text="Test"
+            />
 
-      <TextView
-          android:id="@+id/text_view_total_tasks"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/text_view_routine_name"
-          android:layout_marginLeft="@dimen/default_margin"
-          android:layout_marginStart="@dimen/default_margin"
-          android:fontFamily="sans-serif-light"
-          tools:text="3 Tasks"
-          />
+        <TextView
+            android:id="@+id/text_view_total_tasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            tools:text="3 Tasks"
+            />
+      </LinearLayout>
 
 
       <TextView
@@ -85,16 +88,7 @@
           android:fontFamily="sans-serif-light"
           android:text="@string/tap_to_add_tasks"
           />
-      <!--<ImageView-->
-      <!--android:id="@+id/image_view_play_routine"-->
-      <!--android:layout_width="52dp"-->
-      <!--android:layout_height="52dp"-->
-      <!--android:layout_alignBottom="@id/text_view_task_time"-->
-      <!--android:layout_alignParentEnd="true"-->
-      <!--android:layout_alignParentRight="true"-->
-      <!--android:layout_alignTop="@id/text_view_routine_name"-->
-      <!--android:src="@drawable/ic_play"-->
-      <!--/>-->
+
       <View
           android:layout_width="match_parent"
           android:layout_height="1dp"

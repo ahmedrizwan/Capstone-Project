@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/widget"
-    android:background="@android:color/white"
+    android:background="@color/redColorPrimary"
+
     >
 
   <TextView
@@ -16,8 +17,8 @@
       android:gravity="center"
       android:padding="8dp"
       android:text="Routines"
-      android:background="@android:color/white"
-      android:textColor="@android:color/black"
+      android:textColor="@android:color/white"
+      android:textStyle="bold"
       android:textSize="16sp"
       />
 
@@ -25,7 +26,7 @@
 
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@android:color/darker_gray"
+      android:background="@android:color/white"
       >
 
     <ListView

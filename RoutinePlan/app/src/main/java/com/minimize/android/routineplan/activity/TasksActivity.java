@@ -19,6 +19,8 @@ import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.minimize.android.routineplan.App;
+import com.minimize.android.routineplan.MyService;
 import com.minimize.android.routineplan.R;
 import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
@@ -60,9 +62,16 @@ public class TasksActivity extends BaseActivity {
   int[] mMinutes = { 30, 60, 90, 120, 150, 180 };
   String[] mDisplayValues = new String[mMinutes.length];
 
+  private MyService mService;
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    App application = (App) getApplication();
+    if (application.isServiceBound()) {
+      mService = application.getServiceInstance();
+    }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
+
     mBinding.recyclerViewRoutines.setLayoutManager(new LinearLayoutManager(this));
     mDisplayValues = convertMinutesToStrings(mMinutes);
 
@@ -71,6 +80,18 @@ public class TasksActivity extends BaseActivity {
 
     ActionBar supportActionBar = getSupportActionBar();
     mRoutine = Parcels.unwrap(getIntent().getParcelableExtra(Keys.ROUTINE));
+
+    if(mService!=null ){
+      int routineState = mService.getRoutineState(mRoutine.getName());
+      if(routineState == MyService.PLAYING || routineState == MyService.PAUSED){
+        //launch the play activity
+        Intent intent = new Intent(this, PlayActivity.class);
+        startActivity(intent);
+        finish();
+      }
+
+
+    }
 
     if (supportActionBar != null) {
       supportActionBar.setDisplayHomeAsUpEnabled(true);
@@ -196,9 +217,11 @@ public class TasksActivity extends BaseActivity {
     mBinding.play.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         //Start Play Activity passing in Routine item
+        mService.stopRoutine();
         Intent intent = new Intent(TasksActivity.this, PlayActivity.class);
         intent.putExtra(Keys.ROUTINE, Parcels.wrap(mRoutine));
         startActivity(intent);
+        finish();
       }
     });
 

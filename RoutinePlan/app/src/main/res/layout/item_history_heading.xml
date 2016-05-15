@@ -5,7 +5,7 @@
 
   <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="52dp"
+      android:layout_height="@dimen/list_item_size_small"
       android:orientation="vertical"
 
       >
@@ -16,10 +16,10 @@
         android:id="@+id/heading"
         tools:text="Heading"
         android:layout_gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="@dimen/tv_size_normal"
         android:fontFamily="sans-serif-light"
         android:textStyle="bold"
-        android:padding="16dp"
+        android:padding="@dimen/default_margin"
         />
     <View
         android:layout_width="match_parent"
