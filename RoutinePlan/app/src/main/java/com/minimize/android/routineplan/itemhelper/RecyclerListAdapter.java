@@ -23,15 +23,15 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     implements ItemTouchHelperAdapter {
 
   private final List<Task> mItems = new ArrayList<>();
-  private final OnItemClick<Task> mOnItemClick;
   private final OnItemsReordered mOnItemsReordered;
   private final OnItemDelete mOnItemDelete;
+  private final OnItemRename mOnItemRename;
 
-  public RecyclerListAdapter(List<Task> items, OnItemClick<Task> itemClick, OnItemsReordered onItemsReordered, OnItemRename onItemRename, OnItemDelete onItemDelete) {
-    mOnItemClick = itemClick;
+  public RecyclerListAdapter(List<Task> items, OnItemsReordered onItemsReordered, OnItemRename onItemRename, OnItemDelete onItemDelete) {
     mOnItemsReordered = onItemsReordered;
     mItems.addAll(items);
     mOnItemDelete = onItemDelete;
+    mOnItemRename = onItemRename;
   }
 
   @Override public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -51,12 +51,12 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
       }
     });
 
-
-    holder.itemView.setOnClickListener(new View.OnClickListener() {
+    holder.imageViewRename.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        mOnItemClick.onItemClick(task, position);
+        mOnItemRename.onItemRename(task, position);
       }
     });
+
   }
 
   @Override public void onItemDismiss(int position) {

@@ -7,14 +7,9 @@ import android.database.Cursor;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import com.minimize.android.routineplan.MyService;
 import com.minimize.android.routineplan.R;
-import com.minimize.android.routineplan.activity.PlayActivity;
-import com.minimize.android.routineplan.activity.TasksActivity;
 import com.minimize.android.routineplan.data.DbContract;
 import com.minimize.android.routineplan.flux.actions.Keys;
-import com.minimize.android.routineplan.models.Routine;
-import org.parceler.Parcels;
 
 public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -34,13 +29,13 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
   }
 
   @Override public void onDataSetChanged() {
-
   }
 
   @Override public void onDestroy() {
   }
 
   @Override public int getCount() {
+    mCursor = mContentResolver.query(DbContract.Routine.CONTENT_URI, null, null, null, null);
     return mCursor != null ? mCursor.getCount() : 0;
   }
 
@@ -60,24 +55,9 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
       rv.setTextViewText(R.id.text_view_routine_name, routineName);
     }
 
-    MyService instance = MyService.getInstance();
-    if (instance != null) {
-      int routineState = instance.getRoutineState(routineName);
-      if (routineState == MyService.PLAYING || routineState == MyService.PAUSED) {
-        Intent launchActivity = new Intent(mContext, PlayActivity.class);
-        rv.setOnClickFillInIntent(R.id.routine_item, launchActivity);
-      } else {
-        Intent launchActivity = new Intent(mContext, TasksActivity.class);
-        Routine routine = new Routine(routineName, 0, 5);
-        launchActivity.putExtra(Keys.ROUTINE, Parcels.wrap(routine));
-        rv.setOnClickFillInIntent(R.id.routine_item, launchActivity);
-      }
-    } else {
-      Intent launchActivity = new Intent(mContext, TasksActivity.class);
-      Routine routine = new Routine(routineName, 0, 5);
-      launchActivity.putExtra(Keys.ROUTINE, Parcels.wrap(routine));
-      rv.setOnClickFillInIntent(R.id.routine_item, launchActivity);
-    }
+    Intent intent = new Intent();
+    intent.putExtra(Keys.ROUTINE, routineName);
+    rv.setOnClickFillInIntent(R.id.item_routine, intent);
 
     return rv;
   }

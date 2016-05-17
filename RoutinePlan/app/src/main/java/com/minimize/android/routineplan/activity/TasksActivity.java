@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.App;
@@ -26,7 +27,6 @@ import com.minimize.android.routineplan.databinding.ActivityTasksBinding;
 import com.minimize.android.routineplan.flux.actions.Keys;
 import com.minimize.android.routineplan.flux.stores.RoutinesStore;
 import com.minimize.android.routineplan.flux.stores.TasksStore;
-import com.minimize.android.routineplan.itemhelper.OnItemClick;
 import com.minimize.android.routineplan.itemhelper.OnItemDelete;
 import com.minimize.android.routineplan.itemhelper.OnItemRename;
 import com.minimize.android.routineplan.itemhelper.OnItemsReordered;
@@ -72,6 +72,7 @@ public class TasksActivity extends BaseActivity {
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
 
+    setSupportActionBar(mBinding.mainToolbar);
     mBinding.recyclerViewRoutines.setLayoutManager(new LinearLayoutManager(this));
     mDisplayValues = convertMinutesToStrings(mMinutes);
 
@@ -98,8 +99,25 @@ public class TasksActivity extends BaseActivity {
       supportActionBar.setTitle(mRoutine.getName() + " Tasks");
     }
 
-    mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST, new OnItemClick<Task>() {
-      @Override public void onItemClick(final Task item, final int position) {
+    mRecyclerListAdapter = new RecyclerListAdapter(Collections.EMPTY_LIST,  new OnItemsReordered() {
+
+      @Override public void onItemsReordered(final List<Task> tasks) {
+        if (mTimer != null) {
+          mTimer.cancel();
+        }
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+          @Override public void run() {
+            runOnUiThread(new Runnable() {
+              @Override public void run() {
+                mActionsCreator.updateTasks(mRoutine.getName(), tasks);
+              }
+            });
+          }
+        }, 1000);
+      }
+    }, new OnItemRename() {
+      @Override public void onItemRename(final Task item, final int position) {
         //Launch material dialog
         final EditText editTextTaskName = new EditText(TasksActivity.this);
         editTextTaskName.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -135,31 +153,12 @@ public class TasksActivity extends BaseActivity {
                 if (taskName.length() > 0) {
                   //mActionsCreator.upd(mRoutine, task, mTasks.size());
                   mActionsCreator.updateTask(mRoutine.getName(), item, task, position);
+                } else {
+                  Toast.makeText(TasksActivity.this, "Wrong Input", Toast.LENGTH_SHORT).show();
                 }
               }
             })
             .show();
-      }
-    }, new OnItemsReordered() {
-
-      @Override public void onItemsReordered(final List<Task> tasks) {
-        if (mTimer != null) {
-          mTimer.cancel();
-        }
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
-          @Override public void run() {
-            runOnUiThread(new Runnable() {
-              @Override public void run() {
-                mActionsCreator.updateTasks(mRoutine.getName(), tasks);
-              }
-            });
-          }
-        }, 1000);
-      }
-    }, new OnItemRename() {
-      @Override public void onItemRename(final Task item) {
-
       }
     }, new OnItemDelete() {
       @Override public void onItemDelete(Task item) {
@@ -378,6 +377,8 @@ public class TasksActivity extends BaseActivity {
                 Task task = new Task(taskName, convertStringToMinutes(time));
                 if (taskName.length() > 0) {
                   mActionsCreator.createTask(mRoutine.getName(), task, mTasks.size());
+                } else {
+                  Toast.makeText(TasksActivity.this, "Wrong Input", Toast.LENGTH_SHORT).show();
                 }
               }
             })

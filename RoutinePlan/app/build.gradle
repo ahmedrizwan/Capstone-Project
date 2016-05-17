@@ -13,8 +13,39 @@ android {
     versionCode 1
     versionName "1.0"
   }
+
+  def getStore = { ->
+    def result = project.hasProperty('storeFile') ? storeFile : "null"
+    return result
+  }
+
+  def getStorePassword = { ->
+    def result = project.hasProperty('storePassword') ? storePassword : ""
+    return result
+  }
+
+  def getKeyAlias = { ->
+    def result = project.hasProperty('keyAlias') ? keyAlias : ""
+    return result
+  }
+
+  def getKeyPassword = { ->
+    def result = project.hasProperty('keyPassword') ? keyPassword : ""
+    return result
+  }
+
+  signingConfigs {
+    release {
+      storeFile file(getStore())
+      storePassword getStorePassword()
+      keyAlias getKeyAlias()
+      keyPassword getKeyPassword()
+    }
+  }
+
   buildTypes {
     release {
+      signingConfig signingConfigs.release
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
@@ -37,6 +68,8 @@ android {
   dataBinding {
     enabled true
   }
+
+
 }
 
 dependencies {

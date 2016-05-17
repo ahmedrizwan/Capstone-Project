@@ -26,6 +26,7 @@
           android:padding="@dimen/default_margin"
           android:src="@drawable/ic_edit"
           android:id="@+id/rename"
+          android:contentDescription="@string/rename_routine"
           />
 
       <ImageView
@@ -36,6 +37,7 @@
           android:padding="@dimen/default_margin"
           android:src="@drawable/ic_delete"
           android:id="@+id/delete"
+          android:contentDescription="@string/delete_routine"
           />
     </LinearLayout>
 
@@ -52,6 +54,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:orientation="vertical"
+          android:id="@+id/routine_linear_layout"
           android:layout_marginLeft="@dimen/default_margin"
           android:layout_marginStart="@dimen/default_margin"
           android:layout_marginTop="@dimen/default_margin"
@@ -83,6 +86,9 @@
           android:layout_alignParentEnd="true"
           android:layout_alignParentRight="true"
           android:layout_centerVertical="true"
+          android:layout_toRightOf="@id/routine_linear_layout"
+          android:layout_toEndOf="@id/routine_linear_layout"
+          android:gravity="end"
           android:layout_marginEnd="@dimen/default_margin"
           android:layout_marginRight="@dimen/default_margin"
           android:fontFamily="sans-serif-light"

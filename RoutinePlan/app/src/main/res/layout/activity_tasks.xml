@@ -8,11 +8,20 @@
       android:layout_height="match_parent"
       >
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
+      <android.support.v7.widget.Toolbar
+          android:id="@+id/mainToolbar"
+          android:layout_width="match_parent"
+          android:layout_height="?attr/actionBarSize"
+          android:background="?attr/colorPrimary"
+          android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+          />
 
       <TextView
           android:layout_width="match_parent"
@@ -72,6 +81,7 @@
           android:foreground="?attr/selectableItemBackground"
           android:padding="@dimen/medium_padding"
           android:src="@drawable/ic_play"
+          android:contentDescription="@string/play_routine"
           />
     </LinearLayout>
 

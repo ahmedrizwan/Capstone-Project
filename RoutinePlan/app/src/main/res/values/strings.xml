@@ -7,4 +7,18 @@
   <string name="five_mins_break">5 Mins Break</string>
   <string name="ten_mins_break">10 Mins Break</string>
   <string name="no_history_available">No History Available</string>
+  <string name="time_zeros">00:00:00</string>
+  <string name="pause_routine">Pause Routine</string>
+  <string name="cancel_routine">Cancel Routine</string>
+  <string name="play_routine">Play Routine</string>
+  <string name="awesome_user">Awesome User</string>
+  <string name="preferences">Preferences</string>
+  <string name="about">About</string>
+  <string name="logout">Logout</string>
+  <string name="rename_routine">Rename Routine</string>
+  <string name="delete_routine">Delete Routine</string>
+  <string name="rename_task">Rename Task</string>
+  <string name="delete_task">Delete Task</string>
+  <string name="no_routines">No Routines Found</string>
+  <string name="routines">Routines</string>
 </resources>

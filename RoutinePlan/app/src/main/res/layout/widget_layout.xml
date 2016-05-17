@@ -1,48 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<RelativeLayout
+    android:background="@android:color/white"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/widget"
-    android:background="@color/redColorPrimary"
-
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
   <TextView
-      android:id="@+id/widget_heading"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:elevation="4dp"
       android:fontFamily="sans-serif-light"
       android:gravity="center"
+      android:id="@+id/widget_heading"
+      android:layout_height="@dimen/list_item_size_small"
+      android:layout_width="match_parent"
       android:padding="8dp"
-      android:text="Routines"
+      android:text="@string/routines"
+      android:background="@color/redColorPrimary"
       android:textColor="@android:color/white"
-      android:textStyle="bold"
       android:textSize="16sp"
+      android:textStyle="bold"
       />
 
-  <FrameLayout
-
-      android:layout_width="match_parent"
+  <ListView
+      android:divider="@android:color/black"
+      android:dividerHeight="1px"
+      android:layout_below="@id/widget_heading"
+      android:id="@+id/routines_list"
       android:layout_height="match_parent"
-      android:background="@android:color/white"
-      >
+      android:layout_width="match_parent"
+      />
 
-    <ListView
-        android:id="@+id/routines_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+  <TextView
+      android:gravity="center"
+      android:id="@+id/emptyView"
+      android:layout_height="match_parent"
+      android:layout_width="match_parent"
+      android:text="@string/no_routines"
+      android:textColor="@android:color/black"
+      />
 
-    <TextView
-        android:id="@+id/emptyView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="No Routines Found"
-        android:textColor="@android:color/black"
-        />
-
-  </FrameLayout>
-</LinearLayout>
+</RelativeLayout>

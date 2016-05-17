@@ -27,6 +27,7 @@
           android:padding="@dimen/default_margin"
           android:src="@drawable/ic_edit"
           android:id="@+id/rename"
+          android:contentDescription="@string/rename_task"
           />
 
       <ImageView
@@ -37,6 +38,7 @@
           android:padding="@dimen/default_margin"
           android:src="@drawable/ic_delete"
           android:id="@+id/delete"
+          android:contentDescription="@string/delete_task"
           />
     </LinearLayout>
 
@@ -73,6 +75,9 @@
           android:layout_marginEnd="@dimen/default_margin"
           android:layout_marginRight="@dimen/default_margin"
           android:fontFamily="sans-serif-light"
+          android:layout_toRightOf="@id/task_name"
+          android:layout_toEndOf="@id/task_name"
+          android:gravity="end"
           android:text="@string/tap_to_add_tasks"
           />
 

@@ -44,6 +44,7 @@ public class RoutinesStore extends Store {
           List<Routine> routines = (List<Routine>) action.getData().get(Keys.ROUTINES);
 
           ContentValues contentValues = new ContentValues();
+          mContext.getContentResolver().delete(DbContract.Routine.CONTENT_URI, null, null);
           for (Routine routine : routines) {
             contentValues.put(DbContract.Routine.COLUMN_NAME, routine.getName());
             String totalMinutes = TasksActivity.convertMinutesToString(routine.getTotalMinutes());

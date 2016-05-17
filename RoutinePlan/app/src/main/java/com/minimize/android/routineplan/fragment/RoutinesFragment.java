@@ -15,6 +15,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.minimize.android.routineplan.App;
 import com.minimize.android.routineplan.MyService;
@@ -51,7 +52,6 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
   MyService mService;
   Bus mBus = new Bus(Bus.DEFAULT_IDENTIFIER);
 
-
   @Nullable @Override
   public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
     getActivity().getSupportLoaderManager().initLoader(0, null, this);
@@ -67,6 +67,7 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
     }
 
     rxDataSource = new RxDataSource<>(Collections.<Routine>emptyList());
+
     rxDataSource.<ItemRoutineBinding>bindRecyclerView(mBinding.recyclerViewRoutines, R.layout.item_routine).subscribe(
         new Action1<SimpleViewHolder<Routine, ItemRoutineBinding>>() {
           @Override public void call(final SimpleViewHolder<Routine, ItemRoutineBinding> viewHolder) {
@@ -135,6 +136,8 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
                 // Do something
                 if (input.length() > 0) {
                   mActionsCreator.createRoutine(input.toString().trim(), mRoutines.size());
+                } else {
+                  Toast.makeText(getContext(), "Wrong Input", Toast.LENGTH_SHORT).show();
                 }
               }
             })
@@ -160,7 +163,7 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
     }
   }
 
-  @Subscribe public void onRoutinePause(MyService.RoutinePause routinePause){
+  @Subscribe public void onRoutinePause(MyService.RoutinePause routinePause) {
     rxDataSource.getRxAdapter().notifyDataSetChanged();
   }
 
@@ -190,11 +193,7 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
       mBinding.emptyView.setVisibility(View.GONE);
     }
 
-    Intent intent = new Intent(getContext(), WidgetProvider.class);
-    intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
-    int ids[] = AppWidgetManager.getInstance(getContext()).getAppWidgetIds(new ComponentName(getContext(), WidgetProvider.class));
-    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-    getContext().sendBroadcast(intent);
+
   }
 
   @Subscribe public void onRoutinesError(RoutinesStore.RoutinesError routinesError) {
@@ -215,6 +214,13 @@ public class RoutinesFragment extends BaseFragment implements LoaderManager.Load
           Timber.e("Routine Name : " + data.getString(data.getColumnIndex(DbContract.Routine.COLUMN_NAME)));
           Timber.e("Routine Time : " + data.getString(data.getColumnIndex(DbContract.Routine.COLUMN_TIME)));
         } while (data.moveToNext());
+        Timber.e("onLoadFinished Count : "+data.getCount());
+        AppWidgetManager instance = AppWidgetManager.getInstance(getActivity().getApplication());
+        int widgetIDs[] = instance.getAppWidgetIds(new ComponentName(getActivity().getApplication(), WidgetProvider.class));
+        Intent intent = new Intent(getContext(),WidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,widgetIDs);
+        getContext().sendBroadcast(intent);
       }
     } catch (Exception e) {
 

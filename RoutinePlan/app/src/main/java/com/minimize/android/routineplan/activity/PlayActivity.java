@@ -44,6 +44,7 @@ public class PlayActivity extends BaseActivity {
     mBus = new Bus(Bus.DEFAULT_IDENTIFIER);
 
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_play);
+    setSupportActionBar(mBinding.mainToolbar);
     mTasksStore = TasksStore.get(mDispatcher);
 
     App application = (App) getApplication();

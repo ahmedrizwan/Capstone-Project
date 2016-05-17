@@ -20,7 +20,6 @@
           android:id="@+id/profile_image"
           android:layout_width="80dp"
           android:layout_height="80dp"
-          android:layout_centerHorizontal="true"
           android:layout_gravity="center_horizontal"
           android:layout_margin="16dp"
           android:src="@drawable/ic_account"
@@ -31,12 +30,10 @@
           android:id="@+id/user_name"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_below="@id/profile_image"
-          android:layout_centerHorizontal="true"
           android:layout_gravity="center_horizontal"
           android:layout_marginBottom="16dp"
           android:fontFamily="sans-serif-light"
-          android:text="Awesome User"
+          android:text="@string/awesome_user"
           android:textColor="@android:color/black"
           android:textSize="16sp"
           />
@@ -45,30 +42,24 @@
           android:id="@+id/preferences"
           android:layout_width="300dp"
           android:layout_height="wrap_content"
-          android:layout_below="@id/user_name"
-          android:layout_centerHorizontal="true"
           android:background="@android:color/white"
-          android:text="Preferences"
+          android:text="@string/preferences"
           />
 
       <Button
           android:id="@+id/about"
           android:layout_width="300dp"
           android:layout_height="wrap_content"
-          android:layout_below="@id/preferences"
-          android:layout_centerHorizontal="true"
           android:background="@android:color/white"
-          android:text="About"
+          android:text="@string/about"
           />
 
       <Button
           android:id="@+id/logout"
           android:layout_width="300dp"
           android:layout_height="wrap_content"
-          android:layout_below="@id/about"
-          android:layout_centerHorizontal="true"
           android:background="@android:color/white"
-          android:text="Logout"
+          android:text="@string/logout"
 
           />
 
@@ -77,12 +68,8 @@
           android:id="@+id/sign_in_button"
           android:layout_width="300dp"
           android:layout_height="wrap_content"
-          android:layout_alignParentBottom="true"
-          android:layout_centerHorizontal="true"
           android:layout_margin="16dp"
           />
-
-
 
     </LinearLayout>
   </ScrollView>

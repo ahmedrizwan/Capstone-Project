@@ -187,6 +187,7 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
 
   private void handleSignInResult(GoogleSignInResult result) {
     if (result.isSuccess()) {
+      Timber.e("handleSignInResult : Success");
       // Signed in successfully, show authenticated UI.
       GoogleSignInAccount acct = result.getSignInAccount();
       Glide.with(getContext()).load(acct.getPhotoUrl()).into(mBinding.profileImage);
@@ -200,6 +201,7 @@ public class UserFragment extends BaseFragment implements GoogleApiClient.OnConn
     } else {
       // Signed out, show unauthenticated UI.
       Timber.e("handleSignInResult : Logged Out");
+      signOut();
       mBinding.userName.setText("Awesome User");
     }
   }
